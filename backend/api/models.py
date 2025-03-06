@@ -1,26 +1,9 @@
 from django.db import models
+from django.db.models import UniqueConstraint
 from django.contrib.auth.models import User
 import uuid
 
 # Create your models here.
-class Assignment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # grade_level = models.IntegerField()
-    # course_name = models.CharField(max_length=100)
-    # period = models.IntegerField()
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    type = models.CharField(max_length=50)
-    title = models.TextField()
-    description = models.TextField()
-    total_score = models.IntegerField()
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
-    created_at = models.DateTimeField(auto_now_add=True)
-    due =  models.DateTimeField()
-    files = models.TextField() # Todo: change to file path
-
-    def __str__(self):
-        return '[Assignment]' + self.title
-    
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     grade_level = models.IntegerField()
@@ -34,9 +17,27 @@ class Course(models.Model):
 
     def __str__(self):
         return '[Course]G' + self.grade_level + '_' + self.course_name
+
+class Assignment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # grade_level = models.IntegerField()
+    # course_name = models.CharField(max_length=100)
+    # period = models.IntegerField()
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
+    type = models.CharField(max_length=50)
+    title = models.TextField()
+    description = models.TextField()
+    total_score = models.IntegerField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
+    created_at = models.DateTimeField(auto_now_add=True)
+    due =  models.DateTimeField()
+    files = models.TextField() # Todo: change to file path
+
+    def __str__(self):
+        return '[Assignment]' + self.title
     
 class Student(models.Model):
-    id = models.AutoField()
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
     grade_level = models.IntegerField()
 
@@ -45,8 +46,8 @@ class Student(models.Model):
 
 # bridge table that links students and courses (many-to-many)
 class StudentCourse(models.Model):
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='courses')
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
 
     class Meta:
         constraints = [
@@ -57,7 +58,7 @@ class StudentCourse(models.Model):
         return '[Student-Course]' + self.student_id + '-' + self.course_id
 
 class submission(models.Model):
-    assignment_id = models.ForeignKey(Assignment)
+    assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='submissions')
     content = models.TextField()
     files = models.TextField() # Todo: change to file path
     STATUS_CHOICES = [
@@ -77,9 +78,9 @@ class submission(models.Model):
         return '[Submisstion]' + self.assignment_id + '-' + self.status
 
 class grade(models.Model):
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
-    assignment_id = models.ForeignKey(Assignment)
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='grades')
+    assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='grade')
     score = models.IntegerField()
 
     def __str__(self):
