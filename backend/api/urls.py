@@ -8,4 +8,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='refresh'),
     path('assignments/', views.AssignmentListCreate.as_view(), name='assignment-list'),
     path('assignments/delete/<int:pk>', views.AssignmentDelete.as_view(), name='delete-assignment'),
+    path('courses/', views.GetCourses.as_view(), name='courses'),
 ]

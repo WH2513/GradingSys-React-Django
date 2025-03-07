@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import UserSerializer, AssignmentSerializer
+from .serializers import UserSerializer, CourseSerializer, AssignmentSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Assignment
+from .models import Assignment, Course
 
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
@@ -34,3 +34,10 @@ class AssignmentDelete(generics.DestroyAPIView):
     def get_queryset(self):
         cur_user = self.request.user
         return Assignment.objects.filter(created_by=cur_user)
+    
+class GetCourses(generics.ListAPIView):
+    serializer_class = CourseSerializer
+
+    def get_queryset(self):
+        allCourses = Course.objects.all().order_by('grade_level', 'period')
+        return allCourses

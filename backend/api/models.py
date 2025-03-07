@@ -7,8 +7,8 @@ import uuid
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     grade_level = models.IntegerField()
-    course_name = models.CharField(max_length=100)
     period = models.IntegerField()
+    course_name = models.CharField(max_length=100)
 
     class Meta:
         constraints = [
@@ -16,7 +16,7 @@ class Course(models.Model):
         ]
 
     def __str__(self):
-        return '[Course]G' + self.grade_level + '_' + self.course_name
+        return '[Course]G' + str(self.grade_level) + '_' + self.course_name
 
 class Assignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
