@@ -1,16 +1,16 @@
-import {Navigate} from 'react-router-dom'
-import {jwtDecode} from 'jwt-decode'
-import api from '../api'
-import { REFRESH_TOKEN, ACCESS_TOKEN } from '../constants'
-import { useState, useEffect } from 'react'
+import { Navigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import api from '../api';
+import { REFRESH_TOKEN, ACCESS_TOKEN } from '../constants';
+import { useState, useEffect } from 'react';
 
-function ProtectedRoute({children}) {
+function ProtectedRoute({ children }) {
     const [isAuthorized, setIsAuthorized] = useState(null)
 
     useEffect(() => {
         auth().catch(() => setIsAuthorized(false))
     }, [])
-    
+
     const refreshToken = async () => {
         const refreshToken = localStorage.getItem(REFRESH_TOKEN)
         try {
@@ -24,8 +24,8 @@ function ProtectedRoute({children}) {
                 setIsAuthorized(false)
             }
         } catch (error) {
-            console.log(error)
-            setIsAuthorized(false)
+            console.log(error);
+            setIsAuthorized(false);
         }
     };
 
@@ -47,10 +47,10 @@ function ProtectedRoute({children}) {
     };
 
     if (isAuthorized === null) {
-        return <div>Loading...</div>
+        return <div>Loading...</div>;
     };
 
-    return isAuthorized ? children : <Navigate to='/login' />
+    return isAuthorized ? children : <Navigate to='/login' />;
 }
 
 export default ProtectedRoute
