@@ -6,9 +6,14 @@ function Assignment({assignment, onDelete}) {
     const formattedDue = new Date(assignment.due).toLocaleDateString('en-US')
 
     return <div className='assignment-container'>
-        <p className='assignment-title'>{ assignment.title }</p>
-        <p className='assignment-date'>{ formattedDate }</p>
-        <p className='assignment-date'>{ formattedDue }</p>
+        <a 
+            href={`/assignment/${ assignment.course_id }/students`} 
+            className='assignment-title' 
+        >
+                {assignment.title}
+        </a>
+        <p className='assignment-date'>{formattedDate}</p>
+        <p className='assignment-date'>{formattedDue}</p>
         <button className='delete-button' onClick={() => onDelete(assignment.id)}>
             Delete
         </button>

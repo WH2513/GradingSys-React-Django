@@ -3,12 +3,13 @@ from django.db.models import UniqueConstraint
 from django.contrib.auth.models import User
 import uuid
 
-# Create your models here.
+# Data models
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     grade_level = models.IntegerField()
     period = models.IntegerField()
     course_name = models.CharField(max_length=100)
+    # students = models.ManyToManyField(Student, related_name='as_courses')
 
     class Meta:
         constraints = [
@@ -17,6 +18,15 @@ class Course(models.Model):
 
     def __str__(self):
         return '[Course]G' + str(self.grade_level) + '_' + self.course_name
+
+class Student(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=200)
+    grade_level = models.IntegerField()
+    # courses = models.ManyToManyField(Course, related_name='students')
+
+    def __str__(self):
+        return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
 
 class Assignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -33,14 +43,6 @@ class Assignment(models.Model):
     def __str__(self):
         return '[Assignment]' + self.title
     
-class Student(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=200)
-    grade_level = models.IntegerField()
-
-    def __str__(self):
-        return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
-
 # bridge table that links students and courses (many-to-many)
 class StudentCourse(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='courses')

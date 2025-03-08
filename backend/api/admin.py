@@ -17,6 +17,13 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ['grade_level', "period"]
     search_fields = ["course_name"]
 
+
+# class StudentAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'name', 'grade_level', 'get_courses')
+
+#     def get_courses(self, obj):
+#         return "\n".join([c.course_name for c in obj.courses.all()])
+
 # Register your models here.
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
