@@ -3,7 +3,7 @@ import api from '../api'
 import { ASSIGNMENT_TYPES } from '../constants';
 import '../styles/Form.css'
 import '../styles/Home.css'
-import Assignment from '../components/assignment';
+import Assignment from '../components/Assignment';
 
 
 function Home() {
