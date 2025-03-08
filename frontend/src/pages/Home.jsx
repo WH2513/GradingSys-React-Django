@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import api from '../api'
 import { ASSIGNMENT_TYPES } from '../constants';
 import '../styles/Form.css'
+import '../styles/Home.css'
+import Assignment from '../components/assignment';
 
 
 function Home() {
@@ -62,7 +64,7 @@ function Home() {
     return <div>
         <div>
             <h2>Assignments</h2>
-            {/* TODO */}
+            { assignments.map((a) => <Assignment assignment={a} onDelete={deleteAssignment} key={a.id} />) }
         </div>
         <h2>Create an Assignment</h2>
         <form onSubmit={createAssignment}>
@@ -138,7 +140,6 @@ function Home() {
                 type='text' 
                 id='files' 
                 name='files' 
-                required 
                 onChange={(e) => setFiles(e.target.value)} 
             />
             <button className='form-button' type='submit'>
