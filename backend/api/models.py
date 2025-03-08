@@ -20,9 +20,6 @@ class Course(models.Model):
 
 class Assignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # grade_level = models.IntegerField()
-    # course_name = models.CharField(max_length=100)
-    # period = models.IntegerField()
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
     type = models.CharField(max_length=50)
     title = models.TextField()
@@ -42,7 +39,7 @@ class Student(models.Model):
     grade_level = models.IntegerField()
 
     def __str__(self):
-        return '[Student]G' + self.grade_level + '_' + self.name + '_' + self.id  
+        return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
 
 # bridge table that links students and courses (many-to-many)
 class StudentCourse(models.Model):
@@ -55,7 +52,7 @@ class StudentCourse(models.Model):
         ]
     
     def __str__(self):
-        return '[Student-Course]' + self.student_id + '-' + self.course_id
+        return '[Student-Course]' + str(self.student_id) + '-' + str(self.course_id)
 
 class submission(models.Model):
     assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='submissions')
