@@ -43,10 +43,11 @@ class Assignment(models.Model):
     def __str__(self):
         return '[Assignment]' + self.title
     
-class submission(models.Model):
-    assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='submissions')
-    content = models.TextField()
-    files = models.TextField() # Todo: change to file path
+class Submission(models.Model):
+    assignment_id = models.ForeignKey(Assignment, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
+    student_id = models.ForeignKey(Student, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
+    content = models.TextField(null=True, blank=True)
+    files = models.TextField(null=True, blank=True) # Todo: change to file path
     STATUS_CHOICES = [
         ('turned_in', 'Turned in'),
         ('missing', 'Missing'),
@@ -60,10 +61,14 @@ class submission(models.Model):
         default='not_due_yet',
     )
 
-    def __str__(self):
-        return '[Submisstion]' + self.assignment_id + '-' + self.status
+    class Meta:
+        unique_together = (('student_id', 'assignment_id'),)
+        # primary_key = models.CompositeKey('student', 'assignment')
 
-class grade(models.Model):
+    def __str__(self):
+        return '[Submisstion]' + str(self.assignment_id) + '-' + self.status
+
+class Grade(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='grades')
     assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='grade')

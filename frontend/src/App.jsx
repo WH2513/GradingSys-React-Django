@@ -33,7 +33,8 @@ function App() {
         <Route path='/logout' element={<Logout />}/>
         <Route path='/register' element={<RegisterAndLogout />}/>
         <Route 
-          path='/assignment/:courseid/students' 
+          path='/assignment/:assignment_id/:course_id/students' 
+          // path='/assignment/:courseid/students' 
           element={
             <ProtectedRoute>
               <Students />

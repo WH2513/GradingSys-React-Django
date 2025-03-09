@@ -7,7 +7,8 @@ function Assignment({assignment, onDelete}) {
 
     return <div className='assignment-container'>
         <a 
-            href={`/assignment/${ assignment.course_id }/students`} 
+            href={`/assignment/${ assignment.id }/${ assignment.course_id }/students`} 
+            // href={`/assignment/${ assignment.course_id }/students`} 
             className='assignment-title' 
         >
                 {assignment.title}

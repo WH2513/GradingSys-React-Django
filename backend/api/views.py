@@ -2,9 +2,9 @@ from uuid import UUID
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import UserSerializer, CourseSerializer, AssignmentSerializer, CourseStudentsSerializer
+from .serializers import UserSerializer, CourseSerializer, AssignmentSerializer, CourseStudentsSerializer, SubmissionSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Assignment, Course
+from .models import Assignment, Course, Submission
 
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
@@ -52,3 +52,12 @@ class GetCourseStudents(generics.ListAPIView):
         courseStudents = course.student_set.all()
         
         return courseStudents
+    
+class GetSubmission(generics.ListAPIView):
+    serializer_class = SubmissionSerializer
+    
+    def get_queryset(self):
+        assignmentId = UUID(self.request.get_full_path().split('/')[3])
+        studentId = UUID(self.request.get_full_path().split('/')[5])
+        submission = Submission.objects.filter(assignment_id=assignmentId, student_id=studentId)
+        return submission
