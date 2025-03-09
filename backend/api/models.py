@@ -23,7 +23,7 @@ class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
     grade_level = models.IntegerField()
-    # courses = models.ManyToManyField(Course, related_name='students')
+    courses = models.ManyToManyField(Course)
 
     def __str__(self):
         return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
@@ -43,19 +43,6 @@ class Assignment(models.Model):
     def __str__(self):
         return '[Assignment]' + self.title
     
-# bridge table that links students and courses (many-to-many)
-class StudentCourse(models.Model):
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='courses')
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
-
-    class Meta:
-        constraints = [
-            UniqueConstraint(fields=['student_id', 'course_id'], name='student_course')
-        ]
-    
-    def __str__(self):
-        return '[Student-Course]' + str(self.student_id) + '-' + str(self.course_id)
-
 class submission(models.Model):
     assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='submissions')
     content = models.TextField()

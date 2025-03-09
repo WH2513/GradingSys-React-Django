@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Assignment, Course, StudentCourse
+from .models import Assignment, Course, Student
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,5 +29,5 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 class CourseStudentsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = StudentCourse
-        fields = ['student_id', 'course_id']
+        model = Student
+        fields = ['id', 'name']

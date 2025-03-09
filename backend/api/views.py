@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 from .serializers import UserSerializer, CourseSerializer, AssignmentSerializer, CourseStudentsSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Assignment, Course, StudentCourse
+from .models import Assignment, Course
 
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
@@ -48,9 +48,7 @@ class GetCourseStudents(generics.ListAPIView):
 
     def get_queryset(self):
         courseId = self.request.get_full_path().split('/')[-2]
-        # course = Course.objects.get(id=UUID(courseId))
-        # courseStudents = course.students.all()
-
-        # allCourseStudents = StudentCourse.objects.all()
-        allCourseStudents = StudentCourse.objects.filter(course_id=UUID(courseId))
-        return allCourseStudents
+        course = Course.objects.get(id=UUID(courseId))
+        courseStudents = course.student_set.all()
+        
+        return courseStudents
