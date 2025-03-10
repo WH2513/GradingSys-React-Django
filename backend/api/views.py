@@ -57,7 +57,7 @@ class GetSubmission(generics.ListAPIView):
     serializer_class = SubmissionSerializer
     
     def get_queryset(self):
-        assignmentId = UUID(self.request.get_full_path().split('/')[3])
-        studentId = UUID(self.request.get_full_path().split('/')[5])
-        submission = Submission.objects.filter(assignment_id=assignmentId, student_id=studentId)
+        assignmenId = self.kwargs.get('assignment_id')
+        studentId = self.kwargs.get('student_id')
+        submission = Submission.objects.filter(assignment_id=assignmenId, student_id=studentId)
         return submission

@@ -4,7 +4,7 @@ import '../styles/Assignment.css'
 function Student({student}) {
     return <div className='assignment-container'>
         <p className='assignment-title'>{student[0].name}</p>
-        <p className='assignment-title'>{student[1][0].status}</p>
+        <p className='assignment-title'>{student[1].status}</p>
     </div>
 }
 
