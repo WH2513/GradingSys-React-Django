@@ -31,6 +31,7 @@ function Students() {
             })
             .catch((err) => alert(err));
     };
+
     return <div>
         <h1>{ course_id }</h1>
         { zippedArray.map((s) => <Student student={s} key={s[0].id} />)}

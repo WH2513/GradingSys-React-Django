@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
 import Students from './pages/Students'
+import Submission from './pages/Submission'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function Logout() {
@@ -34,10 +35,17 @@ function App() {
         <Route path='/register' element={<RegisterAndLogout />}/>
         <Route 
           path='/assignment/:assignment_id/:course_id/students' 
-          // path='/assignment/:courseid/students' 
           element={
             <ProtectedRoute>
               <Students />
+            </ProtectedRoute>
+          }
+        />  
+        <Route 
+          path='/submission/:submission_id/grading' 
+          element={
+            <ProtectedRoute>
+              <Submission />
             </ProtectedRoute>
           }
         />  

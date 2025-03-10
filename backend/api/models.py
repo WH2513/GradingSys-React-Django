@@ -9,7 +9,6 @@ class Course(models.Model):
     grade_level = models.IntegerField()
     period = models.IntegerField()
     course_name = models.CharField(max_length=100)
-    # students = models.ManyToManyField(Student, related_name='as_courses')
 
     class Meta:
         constraints = [
@@ -42,17 +41,23 @@ class Assignment(models.Model):
 
     def __str__(self):
         return '[Assignment]' + self.title
-    
+        
 class Submission(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     assignment_id = models.ForeignKey(Assignment, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
     student_id = models.ForeignKey(Student, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
     content = models.TextField(null=True, blank=True)
     files = models.TextField(null=True, blank=True) # Todo: change to file path
+    submitted_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
+    score = models.IntegerField(null=True, blank=True)
+    score_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+
     STATUS_CHOICES = [
-        ('turned_in', 'Turned in'),
+        ('not_due_yet', 'Not due yet(Not turned in)'),
+        ('turned_in', 'Turned in(Ready for grading)'),
         ('missing', 'Missing'),
-        ('late', 'Late'),
-        ('not_due_yet', 'Not due yet'),
+        ('late', 'Late(Graded)'),
     ]
 
     status = models.CharField(
@@ -63,16 +68,6 @@ class Submission(models.Model):
 
     class Meta:
         unique_together = (('student_id', 'assignment_id'),)
-        # primary_key = models.CompositeKey('student', 'assignment')
 
     def __str__(self):
         return '[Submisstion]' + str(self.assignment_id) + '-' + self.status
-
-class Grade(models.Model):
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
-    course_id = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='grades')
-    assignment_id = models.ForeignKey(Assignment, on_delete=models.PROTECT, related_name='grade')
-    score = models.IntegerField()
-
-    def __str__(self):
-        return '[Grade]SID:' + self.student_id + ' CourseID:' + self.course_id + ' AssignmentID:' + self.assignment_id + ' Score:' + self.score

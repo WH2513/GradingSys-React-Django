@@ -1,0 +1,24 @@
+.student-container {
+    padding: 10px;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .student-title {
+    color: #333;
+  }
+
+  .grade-button {
+    background-color: rgb(75, 196, 244); 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .grade-button:hover {
+    background-color: #75bae9; /* Darker green */
+  }

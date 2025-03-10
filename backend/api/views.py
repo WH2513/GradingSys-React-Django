@@ -61,3 +61,29 @@ class GetSubmission(generics.ListAPIView):
         studentId = self.kwargs.get('student_id')
         submission = Submission.objects.filter(assignment_id=assignmenId, student_id=studentId)
         return submission
+
+class GetSubmissionDetail(generics.RetrieveAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
+        submission = Submission.objects.filter(pk=pk)
+        return submission
+
+class GradeSubmission(generics.UpdateAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        submissionId = self.kwargs.get('submission_id')
+        submission = Submission.objects.filter(id=submissionId)
+        return submission
+    
+class SubmissionCreate(generics.CreateAPIView):
+    serializer_class = SubmissionSerializer
+    permission_classes = [IsAuthenticated]
+    # permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Submission.objects.all()
