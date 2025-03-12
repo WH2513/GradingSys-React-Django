@@ -24,7 +24,8 @@ class CourseSerializer(serializers.ModelSerializer):
 class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
-        fields = ['id', 'course_id', 'type', 'title', 'description', 'total_score', 'created_by', 'created_at', 'due']
+        fields = ['id', 'course_id', 'type', 'title', 'description', 
+                  'total_score', 'created_by', 'created_at', 'due', 'files']
         extra_kwargs = {'created_by': {'read_only': True}}
 
 class CourseStudentsSerializer(serializers.ModelSerializer):
@@ -35,6 +36,19 @@ class CourseStudentsSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        fields = ['id', 'assignment_id', 'student_id', 'status']
+        fields = ['id', 'assignment_id', 'student_id', 'status', 'score', 'files', 'content']
+
+class SubmissionUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['score', 'status']
+
+class SubmissionDetailSerializer(serializers.ModelSerializer):
+    student_id = CourseStudentsSerializer(read_only=True)
+    assignment_id = AssignmentSerializer(read_only=True)
+
+    class Meta:
+        model = Submission
+        fields = ['id', 'assignment_id', 'student_id', 'status', 'score', 'files', 'content']
 
 

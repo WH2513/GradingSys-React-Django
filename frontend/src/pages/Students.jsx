@@ -33,7 +33,8 @@ function Students() {
     };
 
     return <div>
-        <h1>{ course_id }</h1>
+        <h1>[Here should be course name]</h1>
+        <h2>Submission - Students</h2>
         { zippedArray.map((s) => <Student student={s} key={s[0].id} />)}
     </div>
 }

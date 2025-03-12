@@ -8,7 +8,7 @@ function Student({student}) {
     return <div className='student-container'>
         <p className='student-title'>{student[0].name}</p>
         <p className='student-title'>{student[1].status}</p>
-        <button className='grade-button' onClick={() => navigate(`/submission/${student[1].id}/grading`)}>
+        <button className='grade-button' hidden={['turned_in', 'graded'].includes(student[1].status) ? false: true} onClick={() => navigate(`/submission/${student[1].id}/grading`)}>
             Grade
         </button>
     </div>

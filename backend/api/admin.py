@@ -23,9 +23,11 @@ class CourseAdmin(admin.ModelAdmin):
 
 #     def get_courses(self, obj):
 #         return "\n".join([c.course_name for c in obj.courses.all()])
+class SubmissionAdmin(admin.ModelAdmin):
+    list_display = ['id', "assignment_id", "student_id", "score"]
 
 # Register your models here.
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Student)
-admin.site.register(Submission)
+admin.site.register(Submission, SubmissionAdmin)

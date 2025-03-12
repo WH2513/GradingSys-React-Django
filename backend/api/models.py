@@ -40,7 +40,7 @@ class Assignment(models.Model):
     files = models.TextField() # Todo: change to file path
 
     def __str__(self):
-        return '[Assignment]' + self.title
+        return '[Assignment]' + self.title + '-' + str(self.id)
         
 class Submission(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -58,6 +58,7 @@ class Submission(models.Model):
         ('turned_in', 'Turned in(Ready for grading)'),
         ('missing', 'Missing'),
         ('late', 'Late(Graded)'),
+        ('graded', 'Graded'),
     ]
 
     status = models.CharField(
@@ -70,4 +71,4 @@ class Submission(models.Model):
         unique_together = (('student_id', 'assignment_id'),)
 
     def __str__(self):
-        return '[Submisstion]' + str(self.assignment_id) + '-' + self.status
+        return '[Submisstion]' + str(self.assignment_id) + '-' + self.status + '-' + str(self.id)

@@ -2,7 +2,8 @@ from uuid import UUID
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import UserSerializer, CourseSerializer, AssignmentSerializer, CourseStudentsSerializer, SubmissionSerializer
+from .serializers import (UserSerializer, CourseSerializer, AssignmentSerializer, \
+    CourseStudentsSerializer, SubmissionSerializer, SubmissionDetailSerializer, SubmissionUpdateSerializer)
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Assignment, Course, Submission
 
@@ -63,22 +64,20 @@ class GetSubmission(generics.ListAPIView):
         return submission
 
 class GetSubmissionDetail(generics.RetrieveAPIView):
-    serializer_class = SubmissionSerializer
+    serializer_class = SubmissionDetailSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
-        submission = Submission.objects.filter(pk=pk)
+        submission = Submission.objects.filter(pk=pk).select_related('assignment_id', 'student_id')
         return submission
 
 class GradeSubmission(generics.UpdateAPIView):
-    serializer_class = SubmissionSerializer
+    serializer_class = SubmissionUpdateSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        submissionId = self.kwargs.get('submission_id')
-        submission = Submission.objects.filter(id=submissionId)
-        return submission
+        return Submission.objects.all()
     
 class SubmissionCreate(generics.CreateAPIView):
     serializer_class = SubmissionSerializer
