@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import NotFound from './pages/NotFound'
 import Students from './pages/Students'
 import Submission from './pages/Submission'
+import MyGrade from './pages/MyGrade'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function Logout() {
@@ -27,6 +28,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/student'
+          element={
+            <ProtectedRoute>
+              <MyGrade />
             </ProtectedRoute>
           }
         />

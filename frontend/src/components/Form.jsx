@@ -18,11 +18,21 @@ function Form({ route, method }) {
         e.preventDefault(); // prevent from reloading the page, which is the default behavior after submit
 
         try {
-            const res = await api.post(route, {username, password})
+            const res = await api.post(route, {username, password});
+            let naviTo = '/';
+            if (username.startsWith("test")) {
+                naviTo = '/student';
+            }
+            // const userRole = await api.post('/api/user/role/', {username, password});
+            // if (userRole.data.role == 'Teacher') {
+            //     naviTo = '/';
+            // } else {
+            //     naviTo = '/student';
+            // }
             if (method === 'login') {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-                navigate('/')
+                navigate(naviTo)
             } else {
                 navigate('/login')
             }
