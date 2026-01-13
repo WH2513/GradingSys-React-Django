@@ -1,4 +1,3 @@
-import react from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Home from './pages/Home'
@@ -21,7 +20,6 @@ function RegisterAndLogout() {
 
 function App() {
   return (
-    <BrowserRouter>
       <Routes>
         <Route
           path='/'
@@ -43,7 +41,7 @@ function App() {
         <Route path='/logout' element={<Logout />}/>
         <Route path='/register' element={<RegisterAndLogout />}/>
         <Route 
-          path='/assignment/:assignment_id/:course_id/students' 
+          path='/assignment/submissions' 
           element={
             <ProtectedRoute>
               <Students />
@@ -51,7 +49,7 @@ function App() {
           }
         />  
         <Route 
-          path='/submission/:submission_id/grading' 
+          path='/submission/grading' 
           element={
             <ProtectedRoute>
               <Submission />
@@ -60,7 +58,6 @@ function App() {
         />  
         <Route path='*' element={<NotFound />}/>
       </Routes>
-    </BrowserRouter>
   )
 }
 
