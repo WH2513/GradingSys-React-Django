@@ -36,8 +36,8 @@ class Assignment(models.Model):
     total_score = models.IntegerField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
     created_at = models.DateTimeField(auto_now_add=True)
-    due =  models.DateTimeField()
-    files = models.TextField() # Todo: change to file path
+    due =  models.DateTimeField(null=True, blank=True)
+    files = models.TextField(null=True, blank=True) # Todo: change to file path
 
     def __str__(self):
         return '[Assignment]' + self.title + '-' + str(self.id)
