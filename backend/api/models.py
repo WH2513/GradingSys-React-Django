@@ -48,6 +48,7 @@ class Submission(models.Model):
     student_id = models.ForeignKey(Student, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
     content = models.TextField(null=True, blank=True)
     files = models.TextField(null=True, blank=True) # Todo: change to file path
+    comment = models.TextField(null=True, blank=True)
     submitted_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
     score = models.IntegerField(null=True, blank=True)

@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import Assignment, Course, Student, Submission
 
+class GroupsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['id', 'name']
+
 class UserSerializer(serializers.ModelSerializer):
+    groups = GroupsSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'username', 'password', 'groups']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -34,14 +40,16 @@ class CourseStudentsSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 class SubmissionSerializer(serializers.ModelSerializer):
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+
     class Meta:
         model = Submission
-        fields = ['id', 'assignment_id', 'student_id', 'status', 'score', 'files', 'content']
+        fields = ['id', 'assignment_id', 'student_id', 'status', 'status_display', 'score', 'files', 'content']
 
 class SubmissionUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        fields = ['score', 'status']
+        fields = ['score', 'status', 'comment']
 
 class SubmissionDetailSerializer(serializers.ModelSerializer):
     student_id = CourseStudentsSerializer(read_only=True)
