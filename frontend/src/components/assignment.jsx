@@ -8,7 +8,7 @@ function Assignment({assignment, onDelete}) {
     return <div className='assignment-container'>
         <Link 
             to={`/assignment/submissions/`} 
-            state={{ assignment: assignment }}
+            state={ assignment }
             className='assignment-title' 
         >
                 {assignment.title}

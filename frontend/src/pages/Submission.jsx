@@ -1,94 +1,46 @@
 import { useState, useEffect } from 'react'
 import api from '../api'
-import { useParams } from "react-router-dom";
-import '../styles/Form.css'
+import { useLocation, useParams } from "react-router-dom";
+import '../styles/Login.css'
+import '../styles/Global.css'
+import AssignmentDetail from '../components/AssignmentDetail';
 
 
 function Submission() {
-    const { submission_id } = useParams();
-    // fields for assignment details
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [total_score, setTotal_score] = useState(0);
-    const [due, setDue] = useState('');
-    const [assignmentFiles, setAssignmentFiles] = useState([]);
-    const [type, setType] = useState('');
-
+    const [message, setMessage] = useState('');
+    const isError = false;
     // fields for submission details
-    const [content, setContent] = useState('');
-    const [files, setFiles] = useState('');
-    const [score, setScore] = useState('');
-
-    useEffect(() => {
-        loadSubmission(submission_id);
-    }, [])
-
-    const loadSubmission = (submission_id) => {
-        api
-            .get(`/api/submission/${submission_id}/`)
-            .then((res) => res.data)
-            .then((data) => {
-                console.log(data);
-                // set assignment details
-                setTitle(data.assignment_id.title);
-                setDescription(data.assignment_id.description);
-                setTotal_score(data.assignment_id.total_score);
-                setDue(data.assignment_id.due);
-                setAssignmentFiles(data.assignment_id.files);
-                setType(data.assignment_id.type);
-
-                // set submission details
-                setContent(data.content);
-                setFiles(data.files);
-                setScore(data.score);
-            })
-            .catch((err) => alert(err));
-    }
+    const { state } = useLocation();
+    const submission = state.submission;
+    const [score, setScore] = useState(state.submission.score ? state.submission.score : 0);
+    const [comment, setComment] = useState(state.submission.comment ? state.submission.comment : '');
 
     const SubmitGrade = (e) => {
         e.preventDefault()
         api
-            .put(`/api/submission/${submission_id}/grading/`, { score: score, status: 'graded' })
+            .put(`/api/submission/${submission.id}/grading/`, { score: score, status: 'graded', comment: comment })
             .then((res) => res.data)
             .then((data) => {
                 console.log(data);
-                alert('Grade submitted successfully');
+                setMessage('Grade submitted successfully!');
+                // alert('Grade submitted successfully');
             })
-            .catch((err) => alert(err));
+            .catch((err) => { isError = true; setMessage(`Error submitting grade: ${err}`) });
     }
 
     return <div>
+        <AssignmentDetail assignment={state.assignment} />
+        <br />
         <fieldset>
-            <legend>Assignment Detail</legend>
-            <label htmlFor='title'>Title</label>
+            <legend>Submission: {submission.id}</legend>
+            <label htmlFor='content'>Content</label>
             <br />
             <input
                 className='form-input'
-                id='title'
-                name='title'
+                id='content'
+                name='content'
                 type='text'
-                value={title}
-                readOnly
-            />
-            <br />
-            <label htmlFor='description'>Description</label>
-            <br />
-            <textarea
-                className='form-input'
-                id='description'
-                name='description'
-                value={description}
-                readOnly
-            />
-            <br />
-            <label htmlFor='due'>Due</label>
-            <br />
-            <input
-                className='form-input'
-                id='due'
-                name='due'
-                type='text'
-                value={due}
+                value={submission.content}
                 readOnly
             />
             <br />
@@ -99,62 +51,53 @@ function Submission() {
                 id='files'
                 name='files'
                 type='text'
-                value={assignmentFiles}
-                readOnly
-            />
-            <br />
-            <label htmlFor='type'>Type</label>
-            <br />
-            <input
-                className='form-input'
-                id='type'
-                name='type'
-                type='text'
-                value={type}
+                value={submission.files}
                 readOnly
             />
         </fieldset>
-        <div className='grade-container'>
-            <h1>Submission: {submission_id}</h1>
+        <br />
+        <fieldset style={{
+            border: "1px solid #088412",
+            padding: "16px",
+            borderRadius: "8px",
+            background: "#f7fcf9"
+        }}
+        >
+            <legend style={{ cursor: "pointer", fontWeight: 600 }}>
+                Grading</legend>
             <form onSubmit={SubmitGrade}>
-                <label htmlFor='content'>Content</label>
-                <br />
-                <input
-                    className='form-input'
-                    id='content'
-                    name='content'
-                    type='text'
-                    value={content}
-                    readOnly
-                />
-                <br />
-                <label htmlFor='files'>Files</label>
-                <br />
-                <input
-                    className='form-input'
-                    id='files'
-                    name='files'
-                    type='text'
-                    value={files}
-                    readOnly
-                />
-                <br />
                 <label htmlFor='score' className='required-field'>Score</label>
                 <br />
                 <input
                     className='form-input'
                     type='number'
+                    min={0}
+                    max={state.assignment.total_score}
                     value={score}
                     id='score'
                     name='score'
                     required
                     onChange={(e) => setScore(e.target.value)}
-                /> /{total_score}
+                /> &nbsp;/{state.assignment.total_score}
+                <br />
+                <label htmlFor='comment'>Comment/Feedback</label>
+                <br />
+                <textarea
+                    className='form-input'
+                    type='text'
+                    value={comment}
+                    id='comment'
+                    name='comment'
+                    onChange={(e) => setComment(e.target.value)}
+                />
                 <button className='grade-button' type='submit'>
                     Submit
                 </button>
+                <span className={`message ${isError ? "error" : "success"}`}>
+                    {message}
+                </span>
             </form>
-        </div>
+        </fieldset>
     </div>
 }
 
