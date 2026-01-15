@@ -1,0 +1,14 @@
+.message {
+    font-size: 0.9em;
+    margin-left: 10px;
+    align-self: flex-start;
+    white-space: pre-line;
+}
+
+.message.success {
+    color: #237f09;
+}
+
+.message.error {
+    color: #f72828;
+}
