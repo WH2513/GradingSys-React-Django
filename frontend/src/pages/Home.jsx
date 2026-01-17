@@ -4,8 +4,9 @@ import { ASSIGNMENT_TYPES } from '../constants';
 import '../styles/Login.css'
 import '../styles/Home.css'
 import '../styles/Global.css'
+import '../styles/FilePicker.css'
 import Assignment from '../components/Assignment';
-// import { datetime } from 'datetime-js';
+import FilePicker from '../components/FilePicker';
 
 
 function Home() {
@@ -19,7 +20,7 @@ function Home() {
     const [files, setFiles] = useState([]);
     const [due, setDue] = useState(null);
     const [message, setMessage] = useState('');
-    const isError = false;
+    let isError = false;
 
     useEffect(() => {
         getAssignments();
@@ -39,14 +40,45 @@ function Home() {
             .delete(`/api/assignments/delete/${id}/`)
             .then((res) => {
                 if (res.status === 204) setMessage('Assignment deleted!')
-                else {isError = true; setMessage(`Failed to delete assignment: ${id}`)}
+                else { isError = true; setMessage(`Failed to delete assignment: ${id}`) }
                 getAssignments(); // should remove using js removal 
             })
-            .catch((err) => {isError = true; setMessage(`Error deleting assignment: ${err}`)});
+            .catch((err) => { isError = true; setMessage(`Error deleting assignment: ${err}`) });
     }
+
+    async function uploadFile(files) {
+        // 1. Ask Django for a presigned URL
+        const res = await api.post("/api/generate-presigned-urls/", {
+            file_names: files.map((file) => file.name),
+            content_types: files.map((file) => file.type),
+            directory: "AssignmentFiles",
+        });
+
+        const { upload_urls, public_urls } = res.data;
+
+        console.log("Presigned URLs:", upload_urls);
+
+        // 2. Upload directly to R2
+        await Promise.all(
+            files.map((file, i) =>
+                fetch(upload_urls[i], {
+                    method: "PUT",
+                    headers: { "Content-Type": file.type },
+                    body: file,
+                })
+            )
+        );
+
+        // 3. Return the final URL
+        return public_urls;
+    };
 
     const createAssignment = async (e) => {
         e.preventDefault();
+        let public_urls = [];
+        if (files.length > 0) {
+            public_urls = await uploadFile(files);
+        }
 
         try {
             const res = await api.post("/api/assignments/", {
@@ -56,7 +88,7 @@ function Home() {
                 description,
                 total_score: Number(total_score),
                 due: new Date(due + ":00").toISOString() || null,
-                // files
+                file_urls: public_urls,
             });
 
             // alert("Assignment created!");
@@ -150,13 +182,44 @@ function Home() {
             <br />
             <label htmlFor='files'>Files</label>
             <br />
-            <input
-                className='form-input'
-                type='text'
-                id='files'
-                name='files'
-                onChange={(e) => setFiles(e.target.value)}
+            <FilePicker onFilesSelected={(newFiles) =>
+                setFiles((prev) => {
+                    const combined = [...prev, ...newFiles];
+                    const unique = Array.from(new Map(combined.map(f => [f.name, f])).values());
+                    return unique;
+                })
+            }
             />
+            <ul style={{ paddingLeft: 0, marginLeft: 0 }}>
+                {files.map((file, index) => (
+                    <li key={file.name + index}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            padding: "6px 10px",
+                            marginBottom: "6px",
+                            position: "relative",
+                        }}
+                    >
+                        {/* Delete button that appears only on hover */}
+                        <button
+                            className="delete-btn"
+                            onClick={() =>
+                                setFiles((prev) => prev.filter((_, i) => i !== index))
+                            }
+                            style={{
+                                transition: "opacity 0.2s",
+                                left: "10px",
+                            }}
+                        >
+                            ✕
+                        </button>
+                        {file.name}
+                    </li>
+                ))}
+            </ul>
+
             <button className='form-button' type='submit'>
                 Create Assignment
             </button>

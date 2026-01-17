@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models import UniqueConstraint
 from django.contrib.auth.models import User
 import uuid
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 # Data models
 class Course(models.Model):
@@ -26,6 +28,14 @@ class Student(models.Model):
 
     def __str__(self):
         return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
+    
+def valisdate_file_url_list(value):
+    validator = URLValidator()
+    for url in value:
+        try:
+            validator(url)
+        except ValidationError:
+            raise ValidationError(f"Invalid URL: {url}")
 
 class Assignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -37,7 +47,12 @@ class Assignment(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments')
     created_at = models.DateTimeField(auto_now_add=True)
     due =  models.DateTimeField(null=True, blank=True)
-    files = models.TextField(null=True, blank=True) # Todo: change to file path
+    file_urls = models.JSONField(
+        default=list, 
+        null=True, 
+        blank=True, 
+        validators=[valisdate_file_url_list],
+        help_text="Public Cloudflare R2 URLs")
 
     def __str__(self):
         return '[Assignment]' + self.title + '-' + str(self.id)
@@ -47,7 +62,7 @@ class Submission(models.Model):
     assignment_id = models.ForeignKey(Assignment, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
     student_id = models.ForeignKey(Student, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
     content = models.TextField(null=True, blank=True)
-    files = models.TextField(null=True, blank=True) # Todo: change to file path
+    files = models.URLField(max_length=500, null=True, blank=True) # Todo: change to file path
     comment = models.TextField(null=True, blank=True)
     submitted_at = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)

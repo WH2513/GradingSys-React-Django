@@ -8,7 +8,7 @@ import AssignmentDetail from '../components/AssignmentDetail';
 
 function Submission() {
     const [message, setMessage] = useState('');
-    const isError = false;
+    let isError = false;
     // fields for submission details
     const { state } = useLocation();
     const submission = state.submission;

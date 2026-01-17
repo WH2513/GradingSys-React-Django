@@ -9,9 +9,15 @@ from .models import Assignment, Course, Submission
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from django.core.files.storage import default_storage
 
 from django.http import HttpResponse
 from django.urls import get_resolver
+import boto3
+from botocore.client import Config
+import os
 
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
@@ -153,3 +159,50 @@ class SubmissionCreate(generics.CreateAPIView):
 
     def get_queryset(self):
         return Submission.objects.all()
+    
+def get_r2_client():
+    return boto3.client(
+        "s3",
+        endpoint_url=f"https://{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com",
+        aws_access_key_id=os.getenv("R2_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("R2_SECRET_ACCESS_KEY"),
+        region_name="auto",  # R2 ignores region but boto3 requires it
+        config=Config(
+            signature_version="s3v4",
+            s3={"addressing_style": "path"}
+        ),
+    )
+    
+class GeneratePresignedURLs(APIView):
+    def post(self, request):
+        file_names = request.data.get("file_names")
+        directory = request.data.get("directory", "uploads")
+
+        keys = [f"{directory}/{file_name}" for file_name in file_names]
+
+        s3 = get_r2_client()
+        print("Client endpoint:", s3.meta.endpoint_url)
+        content_types = request.data.get("content_types")
+
+        presigned_urls = []
+        public_urls = []
+        for i, key in enumerate(keys):
+            presigned_url = s3.generate_presigned_url(
+                "put_object",
+                Params={
+                    "Bucket": os.getenv("R2_BUCKET_NAME"),
+                    "Key": key,
+                    "ContentType": content_types[i]
+                },
+                ExpiresIn=3600  # 1 hour
+            )
+
+            public_url = f"https://{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com/{os.getenv('R2_BUCKET_NAME')}/{key}"
+            presigned_urls.append(presigned_url)
+            public_urls.append(public_url)
+            
+        return Response({
+            "upload_urls": presigned_urls,
+            "public_urls": public_urls
+        })
+

@@ -5,7 +5,7 @@ from .models import Course, Assignment, Student, Submission
 class AssignmentAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {"fields": ['course_id', 'type']}),
-        ('Detail', {"fields": ['title', 'description', 'total_score', 'due', 'files']}),
+        ('Detail', {"fields": ['title', 'description', 'total_score', 'due', 'file_urls']}),
     ]
 
     list_display = ['id', "title", "created_at", "due"]

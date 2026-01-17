@@ -13,6 +13,7 @@ urlpatterns = [
     path('courses/', views.GetCourses.as_view(), name='courses'),
     path('submission/<uuid:pk>/', views.GetSubmissionDetail.as_view(), name='getSubmissionDetail'),
     path('submission/<uuid:pk>/grading/', views.GradeSubmission.as_view(), name='gradeSubmission'),
+    path("generate-presigned-urls/", views.GeneratePresignedURLs.as_view(), name="generate-presigned-urls"),
 ]
 
     # path('submission/', views.SubmissionCreate.as_view(), name='createSubmission'),

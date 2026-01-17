@@ -12,3 +12,11 @@
 .message.error {
     color: #f72828;
 }
+
+.delete-btn {
+  opacity: 0;
+}
+
+ul li:hover .delete-btn {
+  opacity: 1;
+}

@@ -31,7 +31,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
         fields = ['id', 'course_id', 'type', 'title', 'description', 
-                  'total_score', 'created_by', 'created_at', 'due', 'files']
+                  'total_score', 'created_by', 'created_at', 'due', 'file_urls']
         extra_kwargs = {'created_by': {'read_only': True}}
 
 class CourseStudentsSerializer(serializers.ModelSerializer):
