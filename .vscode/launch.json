@@ -1,19 +1,37 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python Debugger: Django",
-            "type": "debugpy",
-            "request": "launch",
-            "args": [
-                "runserver"
-            ],
-            "django": true,
-            "autoStartBrowser": false,
-            "program": "${workspaceFolder}\\backend\\manage.py"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Django Backend",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "program": "${workspaceFolder}/backend/manage.py",
+      "args": ["runserver", "8000", "--noreload"],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Start Vite Dev Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "powershell -Command \"Start-Sleep -Seconds 1; node node_modules/vite/bin/vite.js --port 5173\"",
+      "cwd": "${workspaceFolder}/frontend",
+      "serverReadyAction": {
+        "pattern": "localhost:5173",
+        "uriFormat": "http://localhost:5173",
+        "action": "openExternally"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (Django + Vite)",
+      "configurations": [
+        "Django Backend",
+        "Start Vite Dev Server"
+      ]
+    }
+  ]
 }
