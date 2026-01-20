@@ -6,6 +6,7 @@ import '../styles/Home.css'
 import '../styles/Global.css'
 import Assignment from '../components/Assignment';
 import FilePicker from '../components/FilePicker';
+import InfoLabel from '../components/InfoLabel';
 
 
 function Home() {
@@ -17,7 +18,14 @@ function Home() {
     const [description, setDescription] = useState('');
     const [total_score, setTotal_score] = useState(0);
     const [files, setFiles] = useState([]);
-    const [due, setDue] = useState(null); // default to 24 hours from now
+    // Set default due date to 24 hours from now
+    const pad = n => String(n).padStart(2, "0");
+    const nowPlus24 = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const [due, setDue] = useState(`${nowPlus24.getFullYear()}-` +
+        `${pad(nowPlus24.getMonth() + 1)}-` +
+        `${pad(nowPlus24.getDate())}T` +
+        `${pad(nowPlus24.getHours())}:` +
+        `${pad(nowPlus24.getMinutes())}`); // default to 24 hours from now
     // const [due, setDue] = useState(() => new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()); // default to 24 hours from now
     const [message, setMessage] = useState('');
     let isError = false;
@@ -87,7 +95,7 @@ function Home() {
                 title,
                 description,
                 total_score: Number(total_score),
-                due: new Date(due + ":00").toISOString() || null,
+                due: due || null,
                 file_urls: download_urls,
             });
 
@@ -170,7 +178,11 @@ function Home() {
                 onChange={(e) => setTotal_score(e.target.value)}
             />
             <br />
-            <label htmlFor="due">Due</label>
+            <InfoLabel
+                text="Due Date"
+                hint="Defaults to 24 hours from now"
+                htmlFor="due"
+            />
             <br />
             <input
                 type="datetime-local"
