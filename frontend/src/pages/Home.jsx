@@ -4,7 +4,6 @@ import { ASSIGNMENT_TYPES } from '../constants';
 import '../styles/Login.css'
 import '../styles/Home.css'
 import '../styles/Global.css'
-import '../styles/FilePicker.css'
 import Assignment from '../components/Assignment';
 import FilePicker from '../components/FilePicker';
 
@@ -18,7 +17,8 @@ function Home() {
     const [description, setDescription] = useState('');
     const [total_score, setTotal_score] = useState(0);
     const [files, setFiles] = useState([]);
-    const [due, setDue] = useState(null);
+    const [due, setDue] = useState(null); // default to 24 hours from now
+    // const [due, setDue] = useState(() => new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()); // default to 24 hours from now
     const [message, setMessage] = useState('');
     let isError = false;
 
