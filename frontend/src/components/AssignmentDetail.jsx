@@ -4,7 +4,17 @@ import '../styles/Login.css'
 function AssignmentDetail(assignment) {
     const [open, setOpen] = useState(true);
 
-    return <div>
+    let files = [];
+    const file_urls = assignment.assignment.file_urls;
+    if (file_urls && file_urls.length > 0) {
+        const file_names = file_urls.map(file_name => file_name.split("?")[0].split("/").pop());
+        files = file_names.map((file_name, i) => ({
+            name: file_name,
+            url: file_urls[i]
+        }));
+    }
+
+    return < div >
         <fieldset>
             <legend onClick={() => setOpen(o => !o)}
             >{open ? "▼" : "▶"}Assignment Detail</legend>
@@ -44,14 +54,20 @@ function AssignmentDetail(assignment) {
                     <br />
                     <label htmlFor='files'>Files</label>
                     <br />
-                    <input
-                        className='form-input'
-                        id='files'
-                        name='files'
-                        type='text'
-                        value={assignment.assignment.assignmentFiles}
-                        readOnly
-                    />
+                    <ul style={{ listStyle: "none", padding: 0 }}>
+                        {files?.map((file, index) => (
+                            <li key={index} style={{ marginBottom: "8px" }}>
+                                <a
+                                    href={file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ textDecoration: "none", color: "#0077cc" }}
+                                >
+                                    📄 {file.name}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
                     <br />
                     <label htmlFor='type'>Type</label>
                     <br />
@@ -66,7 +82,7 @@ function AssignmentDetail(assignment) {
                 </div>
             )}
         </fieldset>
-    </div>;
+    </div >;
 }
 
 export default AssignmentDetail;

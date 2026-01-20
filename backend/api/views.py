@@ -181,13 +181,13 @@ class GeneratePresignedURLs(APIView):
         keys = [f"{directory}/{file_name}" for file_name in file_names]
 
         s3 = get_r2_client()
-        print("Client endpoint:", s3.meta.endpoint_url)
+        # print("Client endpoint:", s3.meta.endpoint_url)
         content_types = request.data.get("content_types")
 
-        presigned_urls = []
-        public_urls = []
+        presigned_upload_urls = []
+        presigned_download_urls = []
         for i, key in enumerate(keys):
-            presigned_url = s3.generate_presigned_url(
+            upload_url = s3.generate_presigned_url(
                 "put_object",
                 Params={
                     "Bucket": os.getenv("R2_BUCKET_NAME"),
@@ -197,12 +197,19 @@ class GeneratePresignedURLs(APIView):
                 ExpiresIn=3600  # 1 hour
             )
 
-            public_url = f"https://{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com/{os.getenv('R2_BUCKET_NAME')}/{key}"
-            presigned_urls.append(presigned_url)
-            public_urls.append(public_url)
+            download_url = s3.generate_presigned_url(
+                "get_object",
+                Params={
+                    "Bucket": os.getenv("R2_BUCKET_NAME"),
+                    "Key": key,
+                },
+                ExpiresIn=3600,  # 1 hour
+            )
+            presigned_upload_urls.append(upload_url)
+            presigned_download_urls.append(download_url)
             
         return Response({
-            "upload_urls": presigned_urls,
-            "public_urls": public_urls
+            "upload_urls": presigned_upload_urls,
+            "download_urls": presigned_download_urls
         })
 

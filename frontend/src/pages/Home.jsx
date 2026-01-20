@@ -54,7 +54,7 @@ function Home() {
             directory: "AssignmentFiles",
         });
 
-        const { upload_urls, public_urls } = res.data;
+        const { upload_urls, download_urls } = res.data;
 
         console.log("Presigned URLs:", upload_urls);
 
@@ -70,14 +70,14 @@ function Home() {
         );
 
         // 3. Return the final URL
-        return public_urls;
+        return download_urls;
     };
 
     const createAssignment = async (e) => {
         e.preventDefault();
-        let public_urls = [];
+        let download_urls = [];
         if (files.length > 0) {
-            public_urls = await uploadFile(files);
+            download_urls = await uploadFile(files);
         }
 
         try {
@@ -88,7 +88,7 @@ function Home() {
                 description,
                 total_score: Number(total_score),
                 due: new Date(due + ":00").toISOString() || null,
-                file_urls: public_urls,
+                file_urls: download_urls,
             });
 
             // alert("Assignment created!");
