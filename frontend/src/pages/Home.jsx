@@ -29,6 +29,7 @@ function Home() {
     // const [due, setDue] = useState(() => new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()); // default to 24 hours from now
     const [message, setMessage] = useState('');
     let isError = false;
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     useEffect(() => {
         getAssignments();
@@ -54,6 +55,30 @@ function Home() {
             .catch((err) => { isError = true; setMessage(`Error deleting assignment: ${err}`) });
     }
 
+    function uploadWithProgress(file, url, onProgress) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", url);
+
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    onProgress(percent);
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) resolve();
+                else reject(new Error("Upload failed"));
+            };
+
+            xhr.onerror = () => reject(new Error("Network error"));
+
+            xhr.setRequestHeader("Content-Type", file.type);
+            xhr.send(file);
+        });
+    }
+
     async function uploadFile(files) {
         // 1. Ask Django for a presigned URL
         const res = await api.post("/api/generate-presigned-urls/", {
@@ -66,14 +91,12 @@ function Home() {
 
         console.log("Presigned URLs:", upload_urls);
 
-        // 2. Upload directly to R2
+        // 2. Upload directly to R2, with progress
         await Promise.all(
             files.map((file, i) =>
-                fetch(upload_urls[i], {
-                    method: "PUT",
-                    headers: { "Content-Type": file.type },
-                    body: file,
-                })
+                uploadWithProgress(file, upload_urls[i], (p) =>
+                    setUploadProgress((prev) => ({ ...prev, [file.name]: p }))
+                )
             )
         );
 
@@ -227,7 +250,7 @@ function Home() {
                         >
                             ✕
                         </button>
-                        {file.name}
+                        {file.name} — {uploadProgress[file.name] || 0}%
                     </li>
                 ))}
             </ul>
