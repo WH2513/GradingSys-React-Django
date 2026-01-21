@@ -212,4 +212,31 @@ class GeneratePresignedURLs(APIView):
             "upload_urls": presigned_upload_urls,
             "download_urls": presigned_download_urls
         })
+    
+class DeleteFilesView(APIView):
+    def post(self, request):
+        file_urls = request.data.get("file_urls", [])
+        s3 = get_r2_client()
 
+        objects_to_delete = []
+        for url in file_urls:
+            # Extract the key from the URL
+            parsed_url = url.split(f"/{os.getenv('R2_BUCKET_NAME')}/")[-1].split("?")[0]
+            objects_to_delete.append({"Key": parsed_url})
+
+        if objects_to_delete:
+            response = s3.delete_objects(
+                Bucket=os.getenv("R2_BUCKET_NAME"),
+                Delete={"Objects": objects_to_delete}
+            )
+            return Response({"deleted": response.get("Deleted", [])}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "No files to delete."}, status=status.HTTP_400_BAD_REQUEST)
+
+class AssignmentUpdate(generics.UpdateAPIView):
+    serializer_class = AssignmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        cur_user = self.request.user
+        return Assignment.objects.filter(created_by=cur_user)

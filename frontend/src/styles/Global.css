@@ -20,3 +20,13 @@
 ul li:hover .delete-btn {
   opacity: 1;
 }
+
+.center-header {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.center-header h2 {
+  margin: 0;
+}

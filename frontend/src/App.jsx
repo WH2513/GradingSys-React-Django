@@ -7,6 +7,7 @@ import Students from './pages/Students'
 import Submission from './pages/Submission'
 import MyGrade from './pages/MyGrade'
 import ProtectedRoute from './components/ProtectedRoute'
+import AssignmentCreationEdition from './pages/AssignmentCreateionEdition'
 
 function Logout() {
   localStorage.clear()
@@ -40,6 +41,7 @@ function App() {
         <Route path='/login' element={<Login />}/>
         <Route path='/logout' element={<Logout />}/>
         <Route path='/register' element={<RegisterAndLogout />}/>
+        <Route path='/assignments/create' element={<AssignmentCreationEdition />} />
         <Route 
           path='/assignment/submissions' 
           element={
