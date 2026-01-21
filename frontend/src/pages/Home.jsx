@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import api from '../api'
 import { ASSIGNMENT_TYPES } from '../constants';
-import '../styles/Login.css'
+import '../styles/Form.css'
 import '../styles/Home.css'
 import '../styles/Global.css'
-import Assignment from '../components/Assignment';
+import '../styles/Assignment.css'
 import FilePicker from '../components/FilePicker';
 import InfoLabel from '../components/InfoLabel';
-
+import { Link } from "react-router-dom";
 
 function Home() {
     const [assignments, setAssignments] = useState([]);
@@ -139,10 +139,57 @@ function Home() {
             .catch((err) => alert(err));
     }
 
+    const handleCreate = () => {
+        println("Create assignment clicked");
+    }
+
     return <div>
         <div>
             <h2>Assignments</h2>
-            {assignments.map((a) => <Assignment assignment={a} onDelete={deleteAssignment} key={a.id} />)}
+            <div className="assignments-header">
+                <h2>Assignments</h2>
+
+                <button className="create-btn" onClick={handleCreate}>
+                    Create
+                </button>
+            </div>
+            <table className="assignment-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Created At</th>
+                        <th>Due</th>
+                        {/* <th>Files</th> */}
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {assignments.map((a, index) => (
+                        <tr key={a.id}>
+                            <td>
+                                <Link
+                                    to={`/assignment/submissions/`}
+                                    state={a}
+                                    className='assignment-title'
+                                >
+                                    {a.title}
+                                </Link>
+                            </td>
+                            <td>{new Date(a.created_at).toLocaleDateString('en-US')}</td>
+                            <td>{new Date(a.due).toLocaleDateString('en-US')}</td>
+                            <td>
+                                <button
+                                    className="delete-button"
+                                    onClick={() => deleteAssignment(a.id)}
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
         <h2>Create an Assignment</h2>
         <form onSubmit={createAssignment}>
