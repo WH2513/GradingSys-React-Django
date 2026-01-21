@@ -88,7 +88,7 @@ class AssignmentListCreate(generics.ListCreateAPIView):
 
     def get_queryset(self):
         cur_user = self.request.user
-        return Assignment.objects.filter(created_by=cur_user)
+        return Assignment.objects.filter(created_by=cur_user).order_by('-due')
     
     # Manually set created_by as current user, since the model set it as read-only
     def perform_create(self, serializer):
