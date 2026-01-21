@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../api'
 import { useLocation, useParams } from "react-router-dom";
-import '../styles/Login.css'
+import '../styles/Form.css'
 import '../styles/Global.css'
 import AssignmentDetail from '../components/AssignmentDetail';
 
