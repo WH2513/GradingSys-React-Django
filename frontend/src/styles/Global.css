@@ -1,16 +1,28 @@
+.assignments-header {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* spacing between header, message, and button */
+  margin-bottom: 12px;
+}
+
+.assignments-header h2 {
+  margin: 0;
+}
+
 .message {
-    font-size: 0.9em;
-    margin-left: 10px;
-    align-self: flex-start;
-    white-space: pre-line;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .message.success {
-    color: #237f09;
+  background: #e8f8ec;
+  color: #2e7d32;
 }
 
 .message.error {
-    color: #f72828;
+  background: #fdecea;
+  color: #c62828;
 }
 
 .delete-btn {
