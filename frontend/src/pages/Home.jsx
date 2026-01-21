@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
+import { useFlashMessage } from '../components/useFlashMessage'
 import api from '../api'
 import '../styles/Home.css'
 import '../styles/Global.css'
@@ -7,8 +8,7 @@ import '../styles/Assignment.css'
 
 function Home() {
     const [assignments, setAssignments] = useState([]);
-    const [course_id, setCourse_Id] = useState('');
-    let isError = false;
+    const { showMessage, FlashMessage } = useFlashMessage();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,17 +39,17 @@ function Home() {
         api
             .delete(`/api/assignments/delete/${id}/`)
             .then((res) => {
-                if (res.status === 204) setMessage('Assignment deleted!')
-                else { isError = true; setMessage(`Failed to delete assignment: ${id}`) }
+                if (res.status === 204) showMessage('Assignment deleted!')
+                else { showMessage(`Failed to delete assignment: ${id}`, true) }
                 getAssignments(); // should remove using js removal 
             })
-            .catch((err) => { isError = true; setMessage(`Error deleting assignment: ${err}`) });
+            .catch((err) => { showMessage(`Error deleting assignment: ${err}`, true) });
     }
 
     return <div>
         <div className="assignments-header">
             <h2>Assignments</h2>
-
+            <FlashMessage />
             <button className="create-btn" onClick={createAssignment}>
                 Create
             </button>

@@ -1,19 +1,18 @@
 import { useState } from 'react'
 import api from '../api'
 import { useNavigate } from 'react-router-dom'
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants'
 import '../styles/Form.css'
 import '../styles/Global.css'
 import LoadingIndicator from './LoadingIndicator'
 import { useAuth } from '../context/AuthContext'
+import { useFlashMessage } from './useFlashMessage'
 
 function Form({ route, method }) { // login form 
     const { login } = useAuth();
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState('')
-    let isError = false
+    const { showMessage, FlashMessage } = useFlashMessage();
     const navigate = useNavigate()
 
     const pageName = method === 'login' ? 'Login' : 'Register'
@@ -33,11 +32,10 @@ function Form({ route, method }) { // login form
                 navigate('/login');
             }
         } catch (error) {
-            isError = true;
             if (error.message.includes('401')) {
-                setMessage("Invalid username or password. Please try again.");
+                showMessage("Invalid username or password. Please try again.", true);
             } else {
-                setMessage("An error occurred. Please try again.\nError: " + error.message);
+                showMessage("An error occurred. Please try again.\nError: " + error.message, true);
             }
         } finally {
             setLoading(false);
@@ -67,9 +65,7 @@ function Form({ route, method }) { // login form
             <button className='form-button' type='submit'>
                 {pageName}
             </button>
-            <span className={`message ${isError ? "error" : "success"}`}>
-                {message}
-            </span>
+            <FlashMessage />
         </form>
     );
 }

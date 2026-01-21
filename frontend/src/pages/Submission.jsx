@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
-import api from '../api'
 import { useLocation, useParams } from "react-router-dom";
+import api from '../api'
+import AssignmentDetail from '../components/AssignmentDetail';
+import { useFlashMessage } from '../components/useFlashMessage';
 import '../styles/Form.css'
 import '../styles/Global.css'
-import AssignmentDetail from '../components/AssignmentDetail';
 
 
 function Submission() {
-    const [message, setMessage] = useState('');
-    let isError = false;
+    const { showMessage, FlashMessage } = useFlashMessage();
     // fields for submission details
     const { state } = useLocation();
     const submission = state.submission;
@@ -22,10 +22,10 @@ function Submission() {
             .then((res) => res.data)
             .then((data) => {
                 console.log(data);
-                setMessage('Grade submitted successfully!');
+                showMessage('Grade submitted successfully!');
                 // alert('Grade submitted successfully');
             })
-            .catch((err) => { isError = true; setMessage(`Error submitting grade: ${err}`) });
+            .catch((err) => showMessage(`Error submitting grade: ${err}`, true));
     }
 
     return <div>
@@ -93,9 +93,7 @@ function Submission() {
                 <button className='grade-button' type='submit'>
                     Submit
                 </button>
-                <span className={`message ${isError ? "error" : "success"}`}>
-                    {message}
-                </span>
+                <FlashMessage />
             </form>
         </fieldset>
     </div>

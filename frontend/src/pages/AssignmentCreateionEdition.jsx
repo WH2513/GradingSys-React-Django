@@ -5,6 +5,7 @@ import api from '../api'
 import FilePicker from '../components/FilePicker';
 import InfoLabel from '../components/InfoLabel';
 import uploadWithProgress from '../components/UploadProgress';
+import { useFlashMessage } from '../components/useFlashMessage';
 import '../styles/Form.css'
 import '../styles/Global.css'
 
@@ -36,8 +37,7 @@ function AssignmentCreationEdition() {
         `${pad(nowPlus24.getDate())}T` +
         `${pad(nowPlus24.getHours())}:` +
         `${pad(nowPlus24.getMinutes())}`); // default to 24 hours from now
-    const [message, setMessage] = useState('');
-    let isError = false;
+    const { showMessage, FlashMessage } = useFlashMessage();
     const [uploadProgress, setUploadProgress] = useState(0);
 
     useEffect(() => {
@@ -122,11 +122,11 @@ function AssignmentCreationEdition() {
         try {
             if (state?.page === 'edit') {
                 const res = await api.put(`/api/assignments/${state.a.id}/`, newAssignment);
-                setMessage("Assignment updated!")
+                showMessage("Assignment updated!");
                 return;
             }
             const res = await api.post("/api/assignments/", newAssignment);
-            setMessage("Assignment created!")
+            showMessage("Assignment created!")
         } catch (err) {
             const msg = err.response?.data?.detail || "Failed to create assignment";
             alert(msg);
@@ -267,9 +267,7 @@ function AssignmentCreationEdition() {
             <button className='form-button' type='submit'>
                 {buttonText}
             </button>
-            <span className={`message ${isError ? "error" : "success"}`}>
-                {message}
-            </span>
+            <FlashMessage />
         </form>
     </div>
 }
