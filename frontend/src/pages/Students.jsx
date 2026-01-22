@@ -22,8 +22,8 @@ function Students() {
         api
             .get(`/api/assignment/students/${course_id}/`)
             .then((res) => {
-                console.log("students:", res.data)
-                return res.data
+                console.log("students:", res.data.results)
+                return res.data.results
             })
             .then(async (data) => {
                 setStudents(data);
@@ -31,7 +31,7 @@ function Students() {
                     data.map((student) =>
                         api
                             .get(`/api/assignment/${assignment_id}/student/${student.id}/submission/`)
-                            .then((res) => res.data[0])
+                            .then((res) => res.data.results[0])
                             .catch((err) => console.error(err))
                     )
                 );

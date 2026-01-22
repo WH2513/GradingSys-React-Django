@@ -19,7 +19,7 @@ function Submission() {
         e.preventDefault()
         api
             .put(`/api/submission/${submission.id}/grading/`, { score: score, status: 'graded', comment: comment })
-            .then((res) => res.data)
+            .then((res) => res.data.results)
             .then((data) => {
                 console.log(data);
                 showMessage('Grade submitted successfully!');

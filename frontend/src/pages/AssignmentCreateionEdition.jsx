@@ -63,7 +63,7 @@ function AssignmentCreationEdition() {
             directory: "AssignmentFiles",
         });
 
-        const { upload_urls, download_urls } = res.data;
+        const { upload_urls, download_urls } = res.data.results;
 
         console.log("Presigned URLs:", upload_urls);
 
@@ -136,7 +136,7 @@ function AssignmentCreationEdition() {
     const loadCourses = () => {
         api
             .get('/api/courses/')
-            .then((res) => res.data)
+            .then((res) => res.data.results)
             .then((data) => { setAllCourses(data); console.log(data); })
             .catch((err) => alert(err));
     };

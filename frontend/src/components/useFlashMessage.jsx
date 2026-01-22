@@ -10,7 +10,7 @@ export function useFlashMessage() {
 
     setTimeout(() => {
       setMsg(null);
-    }, 3000);
+    }, 3000 * 2);
   };
 
   const FlashMessage = () =>
