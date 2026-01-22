@@ -164,7 +164,6 @@ class SubmissionCount(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, assignment_id):
-        # assignment_id = self.kwargs.get('assignment_id')
         submission_count = Submission.objects.filter(assignment_id=assignment_id).count()
         return Response({"count": submission_count})
 

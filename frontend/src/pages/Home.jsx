@@ -50,7 +50,20 @@ function Home() {
                         ],
                     });
                 } else {
-                    deleteAssignment(a);
+                    showModal({
+                        text: "Are you sure you want to delete this assignment? ",
+                        isError: false,
+                        actions: [
+                            {
+                                label: "Yes, delete",
+                                onClick: () => deleteAssignment(a),
+                            },
+                            {
+                                label: "No, cancel",
+                                onClick: () => console.log("Canceled"),
+                            },
+                        ],
+                    });
                 };
             })
             .catch((err) => showMessage(`Error checking submissions: ${err}`, true));
