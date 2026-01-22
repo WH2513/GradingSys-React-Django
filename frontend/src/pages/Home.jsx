@@ -33,15 +33,21 @@ function Home() {
         });
     }
 
-    const deleteAssignment = (id) => {
+    const deleteAssignment = (a) => {
         api
-            .delete(`/api/assignments/delete/${id}/`)
-            .then((res) => {
+            .delete(`/api/assignments/delete/${a.id}/`)
+            .then(async (res) => {
                 if (res.status === 204) showMessage('Assignment deleted!')
-                else { showMessage(`Failed to delete assignment: ${id}`, true) }
-                // getAssignments(); // should remove using js removal 
+                else { showMessage(`Failed to delete assignment: ${a.id}`, true) }
+
+                // Delete associated files from R2
+                if (a.file_urls && a.file_urls.length > 0) {
+                    await api.post("/api/delete-files/", { file_urls: a.file_urls });
+                }
+
+                // Refresh assignment list
                 if (useClientPagination) {
-                    setAssignments(prev => prev.filter(a => a.id !== id));
+                    setAssignments(prev => prev.filter(assignment => assignment.id !== a.id));
                 } else {
                     goToPage(currentPage); // reloads current page in server mode
                 }
@@ -93,7 +99,7 @@ function Home() {
                         <td>
                             <button
                                 className="delete-button"
-                                onClick={() => deleteAssignment(a.id)}
+                                onClick={() => deleteAssignment(a)}
                             >
                                 Delete
                             </button>
