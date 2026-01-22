@@ -26,7 +26,7 @@ function Form({ route, method }) { // login form
             let naviTo = username.startsWith("test") ? "/student" : "/";
 
             if (method === 'login') {
-                login(res.data.results.access); // set the access token in context
+                login(res.data.access); // set the access token in context
                 navigate(naviTo);
             } else {
                 navigate('/login');

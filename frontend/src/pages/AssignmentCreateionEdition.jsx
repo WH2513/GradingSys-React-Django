@@ -18,7 +18,7 @@ function AssignmentCreationEdition() {
     const [type, setType] = useState(state?.a?.type || ASSIGNMENT_TYPES[0]['value']);
     const [title, setTitle] = useState(state?.a?.title || '');
     const [description, setDescription] = useState(state?.a?.description || '');
-    const [total_score, setTotal_score] = useState(state?.a?.total_score || 0);
+    const [total_score, setTotal_score] = useState(state?.a?.total_score || '');
     let files_data = [];
     const file_urls = state?.a?.file_urls;
     if (file_urls && file_urls.length > 0) {
@@ -63,7 +63,7 @@ function AssignmentCreationEdition() {
             directory: "AssignmentFiles",
         });
 
-        const { upload_urls, download_urls } = res.data.results;
+        const { upload_urls, download_urls } = res.data;
 
         console.log("Presigned URLs:", upload_urls);
 
@@ -195,7 +195,7 @@ function AssignmentCreationEdition() {
             <br />
             <input
                 className='form-input'
-                type='text'
+                type='number'
                 id='total_score'
                 name='total_score'
                 value={total_score}
