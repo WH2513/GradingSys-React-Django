@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import { useFlashMessage } from '../components/useFlashMessage';
 import { useSmartPagination } from '../components/useSmartPagination';
+import { useModalMessage } from '../components/useModalMessage';
 import api from '../api'
 import '../styles/Home.css'
 import '../styles/Global.css'
@@ -18,6 +19,7 @@ function Home() {
         useClientPagination
     } = useSmartPagination("/api/assignments/", PAGE_SIZE);
 
+    const { showModal, ModalMessage } = useModalMessage();
     const { showMessage, FlashMessage } = useFlashMessage();
     const navigate = useNavigate();
 
@@ -31,6 +33,27 @@ function Home() {
         navigate("/assignments/create", {
             state: { page: "edit", a: a },
         });
+    }
+    const handleDelete = async (a) => {
+        await api.get(`/api/submission/count/${a.id}/`)
+            .then((res) => {
+                const submissionCount = res.data.count;
+                if (submissionCount > 0) {
+                    showModal({
+                        text: "Denied: This assignment has submissions. Deletion is not allowed.",
+                        isError: true,
+                        actions: [
+                            {
+                                label: "Got it",
+                                onClick: () => console.log("Canceled"),
+                            },
+                        ],
+                    });
+                } else {
+                    deleteAssignment(a);
+                };
+            })
+            .catch((err) => showMessage(`Error checking submissions: ${err}`, true));
     }
 
     const deleteAssignment = (a) => {
@@ -97,9 +120,10 @@ function Home() {
                             </button>
                         </td>
                         <td>
+                            <ModalMessage />
                             <button
                                 className="delete-button"
-                                onClick={() => deleteAssignment(a)}
+                                onClick={() => handleDelete(a)}
                             >
                                 Delete
                             </button>

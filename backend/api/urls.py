@@ -11,6 +11,7 @@ urlpatterns = [
     path('assignment/students/<uuid:course_id>/', views.GetCourseStudents.as_view(), name='assignment-students'),
     path('assignment/<uuid:assignment_id>/student/<uuid:student_id>/submission/', views.GetSubmission.as_view(), name='submission'),
     path('courses/', views.GetCourses.as_view(), name='courses'),
+    path('submission/count/<uuid:assignment_id>/', views.SubmissionCount.as_view(), name='submission-count'),
     path('submission/<uuid:pk>/', views.GetSubmissionDetail.as_view(), name='getSubmissionDetail'),
     path('submission/<uuid:pk>/grading/', views.GradeSubmission.as_view(), name='gradeSubmission'),
     path("generate-presigned-urls/", views.GeneratePresignedURLs.as_view(), name="generate-presigned-urls"),
