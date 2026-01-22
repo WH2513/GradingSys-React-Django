@@ -16,6 +16,8 @@ urlpatterns = [
     path("generate-presigned-urls/", views.GeneratePresignedURLs.as_view(), name="generate-presigned-urls"),
     path('delete-files/', views.DeleteFilesView.as_view(), name='delete-files'),
     path('assignments/<uuid:pk>/', views.AssignmentUpdate.as_view(), name='assignment-update'),
+    path('assignments/count/', views.AssignmentListCreate.as_view(), name='assignment-count'),
+    path('assignments/?page=<int:page>/', views.AssignmentListCreate.as_view(), name='assignment-list-paginated'),
 ]
 
     # path('submission/', views.SubmissionCreate.as_view(), name='createSubmission'),

@@ -42,3 +42,28 @@ ul li:hover .delete-btn {
 .center-header h2 {
   margin: 0;
 }
+
+/* Styles for pagination controls */
+.pagination {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.pagination button {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
