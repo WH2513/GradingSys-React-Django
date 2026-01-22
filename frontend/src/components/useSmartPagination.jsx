@@ -19,9 +19,9 @@ export function useSmartPagination(endpoint, itemsPerPage = 20) {
         setUseClientPagination(true);
 
         const allRes = await api.get(`${endpoint}`);
-        setItems(allRes.data);
+        setItems(allRes.data.results);
 
-        setTotalPages(Math.ceil(allRes.data.length / itemsPerPage));
+        setTotalPages(Math.ceil(allRes.data.count / itemsPerPage));
       } else {
         // Server-side mode
         setUseClientPagination(false);
