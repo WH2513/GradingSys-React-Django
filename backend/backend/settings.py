@@ -181,13 +181,12 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://gradingsys-react-django.pages.dev",
-    f"https://{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://gradingsys-react-django-production.up.railway.app",
-    f"https://{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com",
+    "https://gradingsys-react-django.pages.dev"
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
