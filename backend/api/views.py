@@ -247,3 +247,9 @@ class AssignmentUpdate(generics.UpdateAPIView):
     def get_queryset(self):
         cur_user = self.request.user
         return Assignment.objects.filter(created_by=cur_user)
+
+class HealthCheck(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
