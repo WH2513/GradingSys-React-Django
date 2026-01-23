@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Course, Assignment, Student, Submission
+from .models import Course, Assignment, Students, Submission
 
 class AssignmentAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -29,5 +29,5 @@ class SubmissionAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
-admin.site.register(Student)
+admin.site.register(Students)
 admin.site.register(Submission, SubmissionAdmin)
