@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Assignment, Course, Students, Submission
+from .models import Assignment, Course, Student, Submission
 
 class GroupsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,7 +36,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 class CourseStudentsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Students
+        model = Student
         fields = ['id', 'name']
 
 class SubmissionSerializer(serializers.ModelSerializer):

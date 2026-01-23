@@ -20,25 +20,7 @@ class Course(models.Model):
     def __str__(self):
         return '[Course]G' + str(self.grade_level) + '_' + self.course_name
 
-# class Student(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     name = models.CharField(max_length=200)
-#     grade_level = models.IntegerField()
-#     courses = models.ManyToManyField(Course)
-
-#     def __str__(self):
-#         return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
-
-class Students(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=200)
-    grade_level = models.IntegerField()
-    courses = models.ManyToManyField(Course)
-
-    def __str__(self):
-        return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
-
-class StudentsUUID(models.Model):
+class Student(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
     grade_level = models.IntegerField()
@@ -78,7 +60,7 @@ class Assignment(models.Model):
 class Submission(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     assignment_id = models.ForeignKey(Assignment, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
-    student_id = models.ForeignKey(Students, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
+    student_id = models.ForeignKey(Student, default=uuid.UUID('00000000-0000-0000-0000-000000000000'), on_delete=models.PROTECT, related_name='submissions')
     content = models.TextField(null=True, blank=True)
     files = models.URLField(max_length=500, null=True, blank=True) # Todo: change to file path
     comment = models.TextField(null=True, blank=True)
