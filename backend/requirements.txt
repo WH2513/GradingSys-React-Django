@@ -1,5 +1,5 @@
 asgiref
-Django
+Django>=4.2
 django-cors-headers
 djangorestframework
 djangorestframework-simplejwt
@@ -10,3 +10,7 @@ psycopg2-binary
 python-dotenv
 django-storages
 boto3
+psycopg2-binary
+gunicorn
+whitenoise
+dj-database-url
