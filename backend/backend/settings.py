@@ -180,11 +180,12 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://*.railway.app",
+    "https://gradingsys-react-django-production.up.railway.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "https://gradingsys-react-django-production.up.railway.app",
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
