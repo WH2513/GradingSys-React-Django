@@ -30,4 +30,7 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          python manage.py check # change to "test" when tests are added
+          env:
+          # Add anything your tests need, or leave empty for now
+          DJANGO_SETTINGS_MODULE: backend.settings
+          python manage.py test # change to "test" when tests are added otherwise "check" to avoid failure
