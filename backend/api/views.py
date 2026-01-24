@@ -198,8 +198,7 @@ class GeneratePresignedURLs(APIView):
                 "put_object",
                 Params={
                     "Bucket": os.getenv("R2_BUCKET_NAME"),
-                    "Key": key,
-                    "ContentType": content_types[i]
+                    "Key": key
                 },
                 ExpiresIn=3600  # 1 hour
             )
