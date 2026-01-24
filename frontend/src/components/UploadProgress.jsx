@@ -17,7 +17,7 @@ function uploadWithProgress(file, url, onProgress) {
 
             xhr.onerror = () => reject(new Error("Network error"));
 
-            xhr.setRequestHeader("Content-Type", file.type);
+            // xhr.setRequestHeader("Content-Type", file.type);
             xhr.send(file);
         });
     }
