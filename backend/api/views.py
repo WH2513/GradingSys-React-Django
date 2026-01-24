@@ -194,6 +194,7 @@ class GeneratePresignedURLs(APIView):
         presigned_upload_urls = []
         presigned_download_urls = []
         for i, key in enumerate(keys):
+            print("Generating presigned URL for key:", key)
             upload_url = s3.generate_presigned_url(
                 "put_object",
                 Params={
