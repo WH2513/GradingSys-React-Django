@@ -28,7 +28,13 @@ RUN python manage.py collectstatic --noinput || true
 # Expose port (Railway uses $PORT)
 EXPOSE 8000
 
+# Add entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
 # Start Gunicorn
-CMD gunicorn backend.wsgi:application \
-    --bind 0.0.0.0:$PORT \
-    --workers 3
+# CMD gunicorn backend.wsgi:application \
+#     --bind 0.0.0.0:$PORT \
+#     --workers 3
