@@ -189,6 +189,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://gradingsys-react-django.pages.dev"
 ]
 
+CORS_ALLOW_ALL_HEADERS = True
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
@@ -203,3 +206,8 @@ AWS_STORAGE_BUCKET_NAME = os.getenv("R2_BUCKET_NAME")
 
 # Your Cloudflare account ID in the endpoint URL
 AWS_S3_ENDPOINT_URL = f"https://{os.getenv('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com"
+
+# Email settings using SendGrid
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
