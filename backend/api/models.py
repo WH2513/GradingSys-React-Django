@@ -25,6 +25,7 @@ class Student(models.Model):
     name = models.CharField(max_length=200)
     grade_level = models.IntegerField()
     courses = models.ManyToManyField(Course)
+    email = models.EmailField(max_length=254, unique=True, null=True, blank=True)
 
     def __str__(self):
         return '[Student]G' + str(self.grade_level) + '_' + self.name + '_' + str(self.id)
