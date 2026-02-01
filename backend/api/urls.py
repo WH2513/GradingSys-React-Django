@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('health/', views.HealthCheck.as_view(), name='health-check'),
     path('user/register/', views.CreateUserView.as_view(), name='register'),
     path('user/groups/', views.GetUserWithGroupsView.as_view(), name='get_user_groups'),
     path('token/', views.CookieTokenObtainPairView.as_view(), name='get_token'),
@@ -19,7 +20,8 @@ urlpatterns = [
     path('assignments/<uuid:pk>/', views.AssignmentUpdate.as_view(), name='assignment-update'),
     path('assignments/count/', views.AssignmentListCreate.as_view(), name='assignment-count'),
     path('assignments/?page=<int:page>/', views.AssignmentListCreate.as_view(), name='assignment-list-paginated'),
-    path('health/', views.HealthCheck.as_view(), name='health-check'),
+    path('assignment-creation-email/', views.SendAssignmentEmails.as_view(), name='send-assignment-emails'),
+    # path('gcode/process/', views.GcodeProcessingView.as_view(), name='gcode-process'),
 ]
 
     # path('submission/', views.SubmissionCreate.as_view(), name='createSubmission'),

@@ -127,9 +127,22 @@ function AssignmentCreationEdition() {
             }
             const res = await api.post("/api/assignments/", newAssignment);
             showMessage("Assignment created!")
+            sendEmailsToStudents(res.data);
         } catch (err) {
             const msg = err.response?.data?.detail || "Failed to create assignment";
             alert(msg);
+        }
+    };
+
+    const sendEmailsToStudents = async (assignment) => {
+        try {
+            const res = await api.post("/api/assignment-creation-email/", 
+                { assignment: assignment }
+            );
+            
+            console.log("Emails sent:", res.data);
+        } catch (err) {
+            console.error("Failed to send emails:", err);
         }
     };
 

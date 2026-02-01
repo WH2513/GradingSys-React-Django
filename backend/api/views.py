@@ -1,3 +1,4 @@
+# import re
 from uuid import UUID
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -12,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.core.files.storage import default_storage
+from django.core.mail import send_mail, EmailMessage
 
 from django.http import HttpResponse
 from django.urls import get_resolver
@@ -253,3 +255,81 @@ class HealthCheck(APIView):
 
     def get(self, request):
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+class SendAssignmentEmails(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        assignment = request.data.get("assignment")
+        try:
+            assignment = Assignment.objects.get(id=assignment["id"])
+            course = assignment.course_id
+            students = course.student_set.all()
+            to_emails = [student.email for student in students if student.email] + [request.user.email]
+
+            subject = f"New Assignment Created by {request.user.username}: {assignment.title}"
+            message = f"Dear Student,\n\nA new assignment titled '{assignment.title}' has been created for your course '{course.course_name}'.\n\nPlease check the grading system portal for more details and to submit your work before the due date: {assignment.due}.\n\nBest regards,\nGrading System Team"
+
+            send_mail(
+                subject,
+                message,
+                "breehope@icloud.com",  # from
+                # "no-reply@gradingsys-react-django.pages.dev",  # from
+                to_emails,                 # to
+                fail_silently=False,
+            )
+
+            return Response({"message": "Emails sent successfully."}, status=status.HTTP_200_OK)
+        except Assignment.DoesNotExist:
+            return Response({"error": "Assignment not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class GcodeProcessingView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         gcode_files = request.data.get("gcode_files", [])
+#         processed_files = []
+#         for gcode_file in gcode_files:
+#             content = gcode_file.read().decode('utf-8', errors='ignore')
+#             lines = content.splitlines()
+#             total_line_count = len(lines)
+#             commands = [line.strip() for line in lines if line.strip() and not line.startswith(';')]
+#             command_count = len(commands)
+
+#             # Calculate distance moved
+#             last_position = {'X': 0.0, 'Y': 0.0, 'Z': 0.0}
+#             total_distance = 0.0
+#             for line in commands:
+#                 command, params = self.parse_gcode_command_line(line)
+#                 if 'X' in params or 'Y' in params or 'Z' in params:
+#                     new_position = {
+#                         'X': params.get('X', last_position['X']),
+#                         'Y': params.get('Y', last_position['Y']),
+#                         'Z': params.get('Z', last_position['Z'])
+#                     }
+#                     distance = sum((new_position[k] - last_position[k])**2 for k in ['X', 'Y', 'Z'])**0.5
+#                     total_distance += distance
+#                     last_position = new_position
+
+#             processed_files.append({
+#                 "file_size": gcode_file.size,
+#                 "line_count": total_line_count,
+#                 "command_count": command_count,
+#                 "distance_travelled": total_distance
+#             })
+
+#         return Response({"processed_files": processed_files}, status=status.HTTP_200_OK)
+    
+# def parse_gcode_command_line(line):
+#     parts = line.split()
+#     command = parts[0]
+#     params = {}
+#     for part in parts[1:]:
+#         match = re.match(r'([A-Z])([-+]?[0-9]*\.?[0-9]+)', part)
+#         if match:
+#             key = match.group(1)
+#             value = float(match.group(2))
+#             params[key] = value
+#     return command, params
