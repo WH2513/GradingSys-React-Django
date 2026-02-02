@@ -21,7 +21,7 @@ urlpatterns = [
     path('assignments/count/', views.AssignmentListCreate.as_view(), name='assignment-count'),
     path('assignments/?page=<int:page>/', views.AssignmentListCreate.as_view(), name='assignment-list-paginated'),
     path('assignment-creation-email/', views.SendAssignmentEmails.as_view(), name='send-assignment-emails'),
-    # path('gcode/process/', views.GcodeProcessingView.as_view(), name='gcode-process'),
+    path('gcode/process/', views.GcodeProcessingView.as_view(), name='gcode-process'),
 ]
 
     # path('submission/', views.SubmissionCreate.as_view(), name='createSubmission'),

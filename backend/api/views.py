@@ -1,4 +1,4 @@
-# import re
+import re
 from uuid import UUID
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -285,51 +285,87 @@ class SendAssignmentEmails(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# class GcodeProcessingView(APIView):
-#     permission_classes = [IsAuthenticated]
+class GcodeProcessingView(APIView):
+    permission_classes = [IsAuthenticated]
 
-#     def post(self, request):
-#         gcode_files = request.data.get("gcode_files", [])
-#         processed_files = []
-#         for gcode_file in gcode_files:
-#             content = gcode_file.read().decode('utf-8', errors='ignore')
-#             lines = content.splitlines()
-#             total_line_count = len(lines)
-#             commands = [line.strip() for line in lines if line.strip() and not line.startswith(';')]
-#             command_count = len(commands)
+    def post(self, request):
+        gcode_files = request.FILES.getlist("gcode_files", [])
+        if not gcode_files:
+            return Response({"error": "No file uploaded"}, status=400)
 
-#             # Calculate distance moved
-#             last_position = {'X': 0.0, 'Y': 0.0, 'Z': 0.0}
-#             total_distance = 0.0
-#             for line in commands:
-#                 command, params = self.parse_gcode_command_line(line)
-#                 if 'X' in params or 'Y' in params or 'Z' in params:
-#                     new_position = {
-#                         'X': params.get('X', last_position['X']),
-#                         'Y': params.get('Y', last_position['Y']),
-#                         'Z': params.get('Z', last_position['Z'])
-#                     }
-#                     distance = sum((new_position[k] - last_position[k])**2 for k in ['X', 'Y', 'Z'])**0.5
-#                     total_distance += distance
-#                     last_position = new_position
+        all_results = {}
 
-#             processed_files.append({
-#                 "file_size": gcode_file.size,
-#                 "line_count": total_line_count,
-#                 "command_count": command_count,
-#                 "distance_travelled": total_distance
-#             })
+        for gcode_file in gcode_files:
+            file_line_count = 0
+            file_target_command_count = 0
+            file_results = []
+            buffer = ""
 
-#         return Response({"processed_files": processed_files}, status=status.HTTP_200_OK)
+            last_position = {'X': 0.0, 'Y': 0.0, 'Z': 0.0}
+            total_distance = 0.0
+
+            # Stream file in chunks
+            for chunk in gcode_file.chunks():
+                text = chunk.decode("utf-8", errors="ignore")
+                buffer += text
+
+                lines = buffer.split("\n")
+                buffer = lines.pop()  # keep last partial line
+                
+                file_line_count += len(lines)
+                target_commands = [line.strip() for line in lines if line.strip() and line.startswith(('G0','G28'))]
+                file_target_command_count += len(target_commands)
+
+                # Calculate distance moved
+                for line in target_commands:
+                    command, params = parse_gcode_command_line(line)
+                    distance, new_position = get_distance(last_position, params)
+                    total_distance += distance
+                    last_position = new_position
+
+                # leftover partial line
+                if buffer and buffer.startswith(('G0','G28')):
+                    file_line_count += 1
+                    file_target_command_count += 1
+                    command, params = parse_gcode_command_line(buffer)
+                    distance, new_position = get_distance(last_position, params)
+                    total_distance += distance
+
+            file_results = {
+                "file_size": str(gcode_file.size // 1024 // 1024) + ' MB',
+                "line_count": file_line_count,
+                "target_command_count": file_target_command_count,
+                "distance_travelled": str(total_distance) + ' mm',
+            }
+            all_results[gcode_file.name] = file_results
+
+        return Response({"results": all_results})
     
-# def parse_gcode_command_line(line):
-#     parts = line.split()
-#     command = parts[0]
-#     params = {}
-#     for part in parts[1:]:
-#         match = re.match(r'([A-Z])([-+]?[0-9]*\.?[0-9]+)', part)
-#         if match:
-#             key = match.group(1)
-#             value = float(match.group(2))
-#             params[key] = value
-#     return command, params
+def parse_gcode_command_line(line):
+    parts = line.split()
+    command = parts[0]
+    params = {}
+    if command == 'G0':
+        for part in parts[1:]:
+            match = re.match(r'([A-Z])([-+]?[0-9]*\.?[0-9]+)', part)
+            if match:
+                key = match.group(1)
+                value = float(match.group(2))
+                params[key] = value
+    return command, params
+
+def get_distance(last_position, params):
+    if 'X' in params or 'Y' in params or 'Z' in params:
+        new_position = {
+            'X': params.get('X', last_position['X']),
+            'Y': params.get('Y', last_position['Y']),
+            'Z': params.get('Z', last_position['Z'])
+        }
+
+    new_position = {
+        'X': 0.0,
+        'Y': 0.0,
+        'Z': 0.0
+    }
+
+    return sum((new_position[k] - last_position[k])**2 for k in ['X', 'Y', 'Z'])**0.5, new_position
