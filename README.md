@@ -73,7 +73,7 @@ SENDGRID_API_KEY=xxxx
 ```
 
 
-💻 Frontend Setup (React)
+### 💻 Frontend Setup (React)
 ```bash
 cd frontend
 npm install
@@ -85,8 +85,9 @@ Configure your API base URL in .env
 VITE_API_URL = 'http://127.0.0.1:8000' (or your-backend-domain)
 ```
 
+---
 
-📁 Project Structure
+## 📁 Project Structure
 ```bash
 GradingSys-React-Django/
 │
@@ -108,37 +109,49 @@ GradingSys-React-Django/
 │
 └── README.md
 ```
+---
 
+## ▶️ Usage
 
-▶️ Usage
-
-Start backend:
+### Start backend:
 ```bash
 python manage.py runserver
 ```
 
-Start frontend:
+### Start frontend:
 ```bash
 npm run dev
 ```
 
-Then open:
+### Then open:
 ```bash
 http://localhost:5173
 ```
+---
 
+## 🧪 Running Tests
 
-🧪 Running Tests
-
-Backend
+### Backend
 ```bash
 pytest
 ```
 
-Frontend
+### Frontend
 ```bash
 npm test
 ```
+---
+## CI/CD
+### 🧪 Backend CI (Django)
+.github/workflows/backend-ci.yml
 
 
 
+### 🎨 Frontend CI (React)
+.github/workflows/frontend-ci.yml
+
+
+### 🚀 CD (Production)
+Backend is deployed on Railway;
+
+Frontend is deployed on Cloudflare Pages @ https://gradingsys-react-django.pages.dev/
