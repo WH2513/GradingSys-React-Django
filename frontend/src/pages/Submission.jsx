@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import React from 'react';
 import { useLocation, useParams } from "react-router-dom";
 import api from '../api'
 import AssignmentDetail from '../components/AssignmentDetail';
 import { useFlashMessage } from '../components/useFlashMessage';
+import LoadingButton from '../components/LoadingButton';
 import '../styles/Form.css'
 import '../styles/Global.css'
 import '../styles/Submission.css'
@@ -16,6 +18,11 @@ function Submission() {
     const [score, setScore] = useState(state.submission.score ? state.submission.score : 0);
     const [comment, setComment] = useState(state.submission.comment ? state.submission.comment : '');
     const [aiResponse, setAiResponse] = useState(null);
+    const [loading, setLoading] = React.useState(false);
+
+    // const [aiFeedback, setAiFeedback] = React.useState("");
+    // const [instructorFeedback, setInstructorFeedback] = React.useState("");
+    const feedbackRef = React.useRef(null);
 
     const SubmitGrade = (e) => {
         e.preventDefault()
@@ -32,19 +39,36 @@ function Submission() {
 
     const aiGrading = (e) => {
         e.preventDefault()
+        setLoading(true);
         api
-            .post(`/api/submission/ai-grading/`, 
-                { rubric: state.assignment.rubric, 
-                    example_answer: state.assignment.example_answer, 
-                    submission: submission.content })
+            .post(`/api/submission/ai-grading/`,
+                {
+                    rubric: state.assignment.rubric,
+                    example_answer: state.assignment.example_answer,
+                    submission: submission.content
+                })
             .then((res) => res.data)
             .then((data) => {
                 setAiResponse(data);
                 console.log(data);
                 showMessage('AI grading initiated successfully!');
             })
-            .catch((err) => showMessage(`Error initiating AI grading: ${err}`, true));
+            .catch((err) => showMessage(`Error initiating AI grading: ${err}`, true))
+            .finally(() => setLoading(false));
     }
+
+    const insertFeedback = (text) => {
+        setComment((prev) => {
+            if (!prev) return text;                 
+            return prev + "\n\n" + text; 
+        });
+
+        // Auto-scroll + focus
+        setTimeout(() => {
+            feedbackRef.current?.scrollIntoView({ behavior: "smooth" });
+            feedbackRef.current?.focus();
+        }, 50);
+    };
 
     return <div>
         <AssignmentDetail assignment={state.assignment} />
@@ -84,7 +108,7 @@ function Submission() {
         >
             <legend style={{ cursor: "pointer", fontWeight: 600 }}>
                 Grading</legend>
-            <form style={{maxWidth: "800px"}} onSubmit={SubmitGrade}>
+            <form style={{ maxWidth: "800px" }} onSubmit={SubmitGrade}>
                 <label htmlFor='score' className='required-field'>Score</label>
                 <br />
                 <input
@@ -102,6 +126,7 @@ function Submission() {
                 <label htmlFor='comment'>Comment/Feedback</label>
                 <br />
                 <textarea
+                    ref={feedbackRef}
                     className='form-input'
                     type='text'
                     value={comment}
@@ -109,11 +134,14 @@ function Submission() {
                     name='comment'
                     onChange={(e) => setComment(e.target.value)}
                 />
-                <button className='ai-grade-button' type='button' onClick={aiGrading}>
+                <LoadingButton
+                    loading={loading}
+                    onClick={aiGrading}
+                >
                     AI Grading Assistant
-                </button>
+                </LoadingButton>
                 &nbsp;
-                <button className='grade-button' type='submit'>
+                <button disabled={loading} className='grade-button' type='submit'>
                     Submit
                 </button>
                 <FlashMessage />
@@ -124,7 +152,17 @@ function Submission() {
                     <p><strong>Strengths:</strong> {aiResponse.strengths.join(", ")}</p>
                     <p><strong>Weaknesses:</strong> {aiResponse.weaknesses.join(", ")}</p>
                     <p><strong>Suggested Score:</strong> {aiResponse.suggested_score}</p>
-                    <p><strong>Feedback Paragraph:</strong> {aiResponse.feedback_paragraph}</p>
+                    <strong>Feedback Paragraph:</strong>
+                    &nbsp;
+                    <button disabled={loading}
+                        className="ai-grade-button"
+                        onClick={() => insertFeedback(aiResponse.feedback_paragraph)}
+                    >
+                        Insert into Feedback
+                    </button>
+                    <p>
+                        {aiResponse.feedback_paragraph}
+                    </p>
                 </div>
             )}
         </fieldset>
