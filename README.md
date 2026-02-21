@@ -1,7 +1,7 @@
-# Grading System (React + Django)
+# AI Powered Grading System (React + Django)
 
 A full‑stack grading management system built with **React** (frontend) and **Django REST Framework** (backend).  
-It allows instructors to upload assignments, students to submit work, and graders to evaluate submissions efficiently.
+It allows instructors to upload assignments, students to submit work, and graders to evaluate submissions efficiently by leveraging the power of AI.
 
 ---
 
