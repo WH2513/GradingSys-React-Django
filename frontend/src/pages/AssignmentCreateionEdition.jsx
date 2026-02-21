@@ -37,6 +37,9 @@ function AssignmentCreationEdition() {
         `${pad(nowPlus24.getDate())}T` +
         `${pad(nowPlus24.getHours())}:` +
         `${pad(nowPlus24.getMinutes())}`); // default to 24 hours from now
+    const [rubric, setRubric] = useState(state?.a?.rubric || '');
+    const [exampleAnswer, setExampleAnswer] = useState(state?.a?.example_answer || '');
+    const [open, setOpen] = useState(false);
     const { showMessage, FlashMessage } = useFlashMessage();
     const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -117,6 +120,8 @@ function AssignmentCreationEdition() {
             total_score: Number(total_score),
             due: due || null,
             file_urls: updatedownload_urls,
+            rubric: rubric || null,
+            example_answer: exampleAnswer || null,
         }
 
         try {
@@ -136,10 +141,10 @@ function AssignmentCreationEdition() {
 
     const sendEmailsToStudents = async (assignment) => {
         try {
-            const res = await api.post("/api/assignment-creation-email/", 
+            const res = await api.post("/api/assignment-creation-email/",
                 { assignment: assignment }
             );
-            
+
             console.log("Emails sent:", res.data);
         } catch (err) {
             console.error("Failed to send emails:", err);
@@ -276,7 +281,42 @@ function AssignmentCreationEdition() {
                     </li>
                 ))}
             </ul>
+            {/* AI grading assistant */}
+            <fieldset>
+                <legend onClick={() => setOpen(o => !o)}
+                >{open ? "▼" : "▶"}AI Grading Assistant (Optional)</legend>
+                {open && (
+                    <div>
+                        <div style={{ marginBottom: "1.5rem" }}>
+                            <label htmlFor="rubric" style={{ fontWeight: "bold" }}>
+                                Rubric (grading criteria)
+                            </label>
+                            <textarea
+                                id="rubric"
+                                value={rubric}
+                                onChange={(e) => setRubric(e.target.value)}
+                                placeholder={`Example:\n1. Clear explanation of algorithm (0–3)\n2. Time complexity analysis (0–2)\n3. Example provided (0–2)\n4. Edge cases discussed (0–3)`}
+                                rows={6}
+                                style={{ width: "100%", marginTop: "0.5rem" }}
+                            />
+                        </div>
 
+                        <div style={{ marginBottom: "2rem" }}>
+                            <label htmlFor="exampleAnswer" style={{ fontWeight: "bold" }}>
+                                Example Answer
+                            </label>
+                            <textarea
+                                id="exampleAnswer"
+                                value={exampleAnswer}
+                                onChange={(e) => setExampleAnswer(e.target.value)}
+                                placeholder="Provide an ideal answer for semantic‑similarity grading."
+                                rows={6}
+                                style={{ width: "100%", marginTop: "0.5rem" }}
+                            />
+                        </div>
+                    </div>
+                )}
+            </fieldset>
             <button className='form-button' type='submit'>
                 {buttonText}
             </button>

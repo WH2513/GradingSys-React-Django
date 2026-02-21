@@ -1,25 +1,23 @@
-import re
-from uuid import UUID
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from rest_framework import generics
-from .serializers import (UserSerializer, CourseSerializer, AssignmentSerializer, \
-    CourseStudentsSerializer, SubmissionSerializer, SubmissionDetailSerializer, SubmissionUpdateSerializer)
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Assignment, Course, Submission
+from rest_framework import status, generics
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-from django.core.files.storage import default_storage
-from django.core.mail import send_mail, EmailMessage
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from django.http import HttpResponse
-from django.urls import get_resolver
+from django.core.mail import send_mail
+from django.contrib.auth.models import User
+
+from backend.api.services.ai_evaluator import evaluate_submission
+from .serializers import (UserSerializer, CourseSerializer, AssignmentSerializer, \
+    CourseStudentsSerializer, SubmissionSerializer, SubmissionDetailSerializer, SubmissionUpdateSerializer)
+from .models import Assignment, Course, Submission
+
 import boto3
 from botocore.client import Config
 import os
+
+import re
 
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
@@ -284,6 +282,16 @@ class SendAssignmentEmails(APIView):
             return Response({"error": "Assignment not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EvaluateSubmission(APIView):
+    def post(self, request, assignment_id):
+        submission = request.data.get("submission")
+        # text = extract_text(submission.file_path)
+        rubric = request.data.get("rubric")
+
+        result = evaluate_submission(submission, rubric)
+
+        return Response(result)
 
 class GcodeProcessingView(APIView):
     permission_classes = [IsAuthenticated]
