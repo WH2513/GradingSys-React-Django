@@ -1,7 +1,10 @@
-# AI Powered Grading System (React + Django)
+# AI-Powered Grading System (React + Django)
 
 A full‑stack grading management system built with **React** (frontend) and **Django REST Framework** (backend).  
-It allows instructors to upload assignments, students to submit work, and graders to evaluate submissions efficiently by leveraging the power of AI.
+It allows instructors to upload assignments, students to submit work, and graders to evaluate submissions efficiently by leveraging the power of Gen AI.
+
+This system dramatically reduces grading time while keeping instructors in full control.
+The AI doesn’t replace the grader — it accelerates them.
 
 ---
 
@@ -22,6 +25,7 @@ It allows instructors to upload assignments, students to submit work, and grader
 - Grade student submissions
 - Upload grading files / feedback
 - Update grading status
+- Use AI grading assistant to help grading
 
 ### 📊 Admin / System
 - Dashboard with statistics
@@ -42,6 +46,11 @@ It allows instructors to upload assignments, students to submit work, and grader
 - Django REST Framework
 - Cloudflare R2 for file storage
 - PostgreSQL (Production) / SQLite (Local)
+
+### AI
+- Llama 3.1 8B
+- Local inference via Ollama
+- Custom grading prompt with rubric + example answer reasoning
 
 ---
 
@@ -85,6 +94,17 @@ Configure your API base URL in .env
 VITE_API_URL = 'http://127.0.0.1:8000' (or your-backend-domain)
 ```
 
+### AI Setup 
+On Windows
+```bash
+irm https://ollama.com/install.ps1 | iex
+ollama pull llama3.1
+ollama run llama3.1
+```
+To check if the model is running
+```bash
+curl http://localhost:11434/api/tags
+```
 ---
 
 ## 📁 Project Structure
@@ -93,10 +113,14 @@ GradingSys-React-Django/
 │
 ├── backend/
 │   ├── api/
+│   │   ├── migrations
+│   │   ├── serializers
+│   │   ├── services
+│   │   ├── tests
+│   │   ├── views
+│   │   ├── apps.py
 │   │   ├── models.py
-│   │   ├── tests.py
 │   │   ├── urls.py
-│   │   ├── views.py
 │   └── ...
 │
 ├── frontend/
