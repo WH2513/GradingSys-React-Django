@@ -18,7 +18,7 @@ The AI doesn’t replace the grader — it accelerates them.
 
 ### 🧑‍🎓 Student
 - View available assignments
-- Upload submissions
+- Upload submissions (Temporarily managed in admin portal (http://127.0.0.1:8000/admin/api/submission/) in order to focus on main feature)
 - Track submission status
 
 ### 📝 Grader
