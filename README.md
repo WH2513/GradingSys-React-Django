@@ -46,6 +46,7 @@ The AI doesn’t replace the grader — it accelerates them.
 - Django REST Framework
 - Cloudflare R2 for file storage
 - PostgreSQL (Production) / SQLite (Local)
+- JWT
 
 ### AI
 - Llama 3.1 8B
