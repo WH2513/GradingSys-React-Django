@@ -54,6 +54,9 @@ class Assignment(models.Model):
         blank=True, 
         validators=[valisdate_file_url_list],
         help_text="Public Cloudflare R2 URLs")
+    rubric = models.TextField(blank=True, null=True)
+    example_answer = models.TextField(blank=True, null=True)
+
 
     def __str__(self):
         return '[Assignment]' + self.title + '-' + str(self.id)

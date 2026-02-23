@@ -1,0 +1,22 @@
+.ai-grade-button {
+    background-color: rgb(225, 135, 74);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.ai-grade-button:hover {
+    background-color: rgb(215, 90, 7);
+    /* Darker orange */
+}
+
+.insert-btn {
+    opacity: 0;
+}
+
+ul li:hover .insert-btn {
+    opacity: 1;
+}

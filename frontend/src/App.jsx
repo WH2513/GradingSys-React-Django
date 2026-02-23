@@ -8,6 +8,7 @@ import Submission from './pages/Submission'
 import MyGrade from './pages/MyGrade'
 import ProtectedRoute from './components/ProtectedRoute'
 import AssignmentCreationEdition from './pages/AssignmentCreateionEdition'
+import Gcode from './pages/Gcode'
 
 function Logout() {
   localStorage.clear()
@@ -59,6 +60,7 @@ function App() {
           }
         />  
         <Route path='*' element={<NotFound />}/>
+        <Route path='/gcode/processing' element={<Gcode />} />
       </Routes>
   )
 }

@@ -1,23 +1,23 @@
-from uuid import UUID
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from rest_framework import generics
-from .serializers import (UserSerializer, CourseSerializer, AssignmentSerializer, \
-    CourseStudentsSerializer, SubmissionSerializer, SubmissionDetailSerializer, SubmissionUpdateSerializer)
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Assignment, Course, Submission
+from rest_framework import status, generics
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-from django.core.files.storage import default_storage
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from django.http import HttpResponse
-from django.urls import get_resolver
+from django.core.mail import send_mail
+from django.contrib.auth.models import User
+
+from backend.api.services.ai_evaluator import evaluate_submission
+from .serializers import (UserSerializer, CourseSerializer, AssignmentSerializer, \
+    CourseStudentsSerializer, SubmissionSerializer, SubmissionDetailSerializer, SubmissionUpdateSerializer)
+from .models import Assignment, Course, Submission
+
 import boto3
 from botocore.client import Config
 import os
+
+import re
 
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
@@ -253,3 +253,127 @@ class HealthCheck(APIView):
 
     def get(self, request):
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+class SendAssignmentEmails(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        assignment = request.data.get("assignment")
+        try:
+            assignment = Assignment.objects.get(id=assignment["id"])
+            course = assignment.course_id
+            students = course.student_set.all()
+            to_emails = [student.email for student in students if student.email] + [request.user.email]
+
+            subject = f"New Assignment Created by {request.user.username}: {assignment.title}"
+            message = f"Dear Student,\n\nA new assignment titled '{assignment.title}' has been created for your course '{course.course_name}'.\n\nPlease check the grading system portal for more details and to submit your work before the due date: {assignment.due}.\n\nBest regards,\nGrading System Team"
+
+            send_mail(
+                subject,
+                message,
+                "breehope@icloud.com",  # from
+                # "no-reply@gradingsys-react-django.pages.dev",  # from
+                to_emails,                 # to
+                fail_silently=False,
+            )
+
+            return Response({"message": "Emails sent successfully."}, status=status.HTTP_200_OK)
+        except Assignment.DoesNotExist:
+            return Response({"error": "Assignment not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EvaluateSubmission(APIView):
+    def post(self, request, assignment_id):
+        submission = request.data.get("submission")
+        # text = extract_text(submission.file_path)
+        rubric = request.data.get("rubric")
+
+        result = evaluate_submission(submission, rubric)
+
+        return Response(result)
+
+class GcodeProcessingView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        gcode_files = request.FILES.getlist("gcode_files", [])
+        if not gcode_files:
+            return Response({"error": "No file uploaded"}, status=400)
+
+        all_results = {}
+
+        for gcode_file in gcode_files:
+            file_line_count = 0
+            file_target_command_count = 0
+            file_results = []
+            buffer = ""
+
+            last_position = {'X': 0.0, 'Y': 0.0, 'Z': 0.0}
+            total_distance = 0.0
+
+            # Stream file in chunks
+            for chunk in gcode_file.chunks():
+                text = chunk.decode("utf-8", errors="ignore")
+                buffer += text
+
+                lines = buffer.split("\n")
+                buffer = lines.pop()  # keep last partial line
+                
+                file_line_count += len(lines)
+                target_commands = [line.strip() for line in lines if line.strip() and line.startswith(('G0','G28'))]
+                file_target_command_count += len(target_commands)
+
+                # Calculate distance moved
+                for line in target_commands:
+                    command, params = parse_gcode_command_line(line)
+                    distance, new_position = get_distance(last_position, params)
+                    total_distance += distance
+                    last_position = new_position
+
+                # leftover partial line
+                if buffer and buffer.startswith(('G0','G28')):
+                    file_line_count += 1
+                    file_target_command_count += 1
+                    command, params = parse_gcode_command_line(buffer)
+                    distance, new_position = get_distance(last_position, params)
+                    total_distance += distance
+
+            file_results = {
+                "file_size": str(gcode_file.size // 1024 // 1024) + ' MB',
+                "line_count": file_line_count,
+                "target_command_count": file_target_command_count,
+                "distance_travelled": str(total_distance) + ' mm',
+            }
+            all_results[gcode_file.name] = file_results
+
+        return Response({"results": all_results})
+    
+def parse_gcode_command_line(line):
+    parts = line.split()
+    command = parts[0]
+    params = {}
+    if command == 'G0':
+        for part in parts[1:]:
+            match = re.match(r'([A-Z])([-+]?[0-9]*\.?[0-9]+)', part)
+            if match:
+                key = match.group(1)
+                value = float(match.group(2))
+                params[key] = value
+    return command, params
+
+def get_distance(last_position, params):
+    if 'X' in params or 'Y' in params or 'Z' in params:
+        new_position = {
+            'X': params.get('X', last_position['X']),
+            'Y': params.get('Y', last_position['Y']),
+            'Z': params.get('Z', last_position['Z'])
+        }
+
+    new_position = {
+        'X': 0.0,
+        'Y': 0.0,
+        'Z': 0.0
+    }
+
+    return sum((new_position[k] - last_position[k])**2 for k in ['X', 'Y', 'Z'])**0.5, new_position
