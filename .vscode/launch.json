@@ -35,7 +35,7 @@
       "program": "${workspaceFolder}/backend/manage.py",
       "args": [
         "test",
-        "api.tests.test_assignment.TestAssignmentCreation",
+        "api.tests.test_assignment.TestAssignmentAPI",
         "--failfast",
         "--keepdb",
         "--verbosity=2"
