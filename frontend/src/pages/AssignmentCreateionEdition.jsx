@@ -209,7 +209,7 @@ function AssignmentCreationEdition() {
                 onChange={(e) => setDescription(e.target.value)}
             />
             <br />
-            <label htmlFor='total_score'>Total Score</label>
+            <label htmlFor='total_score'  className='required-field'>Total Score</label>
             <br />
             <input
                 className='form-input'
